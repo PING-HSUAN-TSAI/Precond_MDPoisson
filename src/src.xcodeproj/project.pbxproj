@@ -1,0 +1,164 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		423E9B9E1D5479350057C583 /* constants.f90 */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran.f90; path = constants.f90; sourceTree = "<group>"; };
+		423E9B9F1D5479350057C583 /* constants.mod */ = {isa = PBXFileReference; lastKnownFileType = file; path = constants.mod; sourceTree = "<group>"; };
+		423E9BA01D5479350057C583 /* Grid2D_Pack.f90 */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran.f90; path = Grid2D_Pack.f90; sourceTree = "<group>"; };
+		423E9BA11D5479350057C583 /* Legendre.f90 */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran.f90; path = Legendre.f90; sourceTree = "<group>"; };
+		423E9BA21D5479350057C583 /* legendre.mod */ = {isa = PBXFileReference; lastKnownFileType = file; path = legendre.mod; sourceTree = "<group>"; };
+		423E9BA31D5479350057C583 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		423E9BA41D5479350057C583 /* MD2D_Grid.f90 */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran.f90; path = MD2D_Grid.f90; sourceTree = "<group>"; };
+		423E9BA51D5479350057C583 /* md2d_grid.mod */ = {isa = PBXFileReference; lastKnownFileType = file; path = md2d_grid.mod; sourceTree = "<group>"; };
+		423E9BA61D5479350057C583 /* MDPS_Wave2D.f90~ */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MDPS_Wave2D.f90~"; sourceTree = "<group>"; };
+		423E9BA71D5479350057C583 /* Poisson2D.f90 */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran.f90; path = Poisson2D.f90; sourceTree = "<group>"; };
+		423E9BA81D5479350057C583 /* Poisson2D.f90~ */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Poisson2D.f90~"; sourceTree = "<group>"; };
+		423E9BA91D5479350057C583 /* splibsrc1.for */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran; path = splibsrc1.for; sourceTree = "<group>"; };
+		423E9BAA1D5479350057C583 /* State_Pack.f90 */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran.f90; path = State_Pack.f90; sourceTree = "<group>"; };
+		423E9BAB1D5479350057C583 /* State_Var.f90 */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.fortran.f90; path = State_Var.f90; sourceTree = "<group>"; };
+		423E9BAC1D5479350057C583 /* state_var.mod */ = {isa = PBXFileReference; lastKnownFileType = file; path = state_var.mod; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		423E9B981D5479350057C583 = {
+			isa = PBXGroup;
+			children = (
+				423E9B9E1D5479350057C583 /* constants.f90 */,
+				423E9B9F1D5479350057C583 /* constants.mod */,
+				423E9BA01D5479350057C583 /* Grid2D_Pack.f90 */,
+				423E9BA11D5479350057C583 /* Legendre.f90 */,
+				423E9BA21D5479350057C583 /* legendre.mod */,
+				423E9BA31D5479350057C583 /* Makefile */,
+				423E9BA41D5479350057C583 /* MD2D_Grid.f90 */,
+				423E9BA51D5479350057C583 /* md2d_grid.mod */,
+				423E9BA61D5479350057C583 /* MDPS_Wave2D.f90~ */,
+				423E9BA71D5479350057C583 /* Poisson2D.f90 */,
+				423E9BA81D5479350057C583 /* Poisson2D.f90~ */,
+				423E9BA91D5479350057C583 /* splibsrc1.for */,
+				423E9BAA1D5479350057C583 /* State_Pack.f90 */,
+				423E9BAB1D5479350057C583 /* State_Var.f90 */,
+				423E9BAC1D5479350057C583 /* state_var.mod */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		423E9B9D1D5479350057C583 /* src */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 423E9BAD1D5479350057C583 /* Build configuration list for PBXLegacyTarget "src" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/IonComputing/Desktop/Poisson2D_fortran/2DPoisson/src;
+			dependencies = (
+			);
+			name = src;
+			passBuildSettingsInEnvironment = 1;
+			productName = src;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		423E9B991D5479350057C583 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 423E9B9C1D5479350057C583 /* Build configuration list for PBXProject "src" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 423E9B981D5479350057C583;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				423E9B9D1D5479350057C583 /* src */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		423E9B9A1D5479350057C583 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		423E9B9B1D5479350057C583 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		423E9BAE1D5479350057C583 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = src;
+			};
+			name = Debug;
+		};
+		423E9BAF1D5479350057C583 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = src;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		423E9B9C1D5479350057C583 /* Build configuration list for PBXProject "src" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				423E9B9A1D5479350057C583 /* Debug */,
+				423E9B9B1D5479350057C583 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		423E9BAD1D5479350057C583 /* Build configuration list for PBXLegacyTarget "src" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				423E9BAE1D5479350057C583 /* Debug */,
+				423E9BAF1D5479350057C583 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 423E9B991D5479350057C583 /* Project object */;
+}
