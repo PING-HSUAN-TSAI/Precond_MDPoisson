@@ -145,7 +145,7 @@ write(*,*)'u',maxval(u)
       do j=0,ND2
       do i=0,ND1
       write(*,*)i,j,u(i,j,DDK)
-      !write(181,fmt="(2I3,1x,1E11.5e3)")i,j,u(i,j,DDK)
+!      !write(181,fmt="(2I3,1x,1E11.5e3)")i,j,u(i,j,DDK)
       enddo
       enddo
       !close(181)
