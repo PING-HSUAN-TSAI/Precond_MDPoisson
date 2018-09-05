@@ -1,20 +1,19 @@
-      subroutine GMRES_WRAPPER(phi,res,n,tol)
+      subroutine GMRES_WRAPPER(phi,res,n,tol,l)
       use Legendre
       use MD2D_Grid
       use GMRES
       implicit none
 
       integer:: n, outer, Nx, Ny
-      real(kind=8):: phi(0:PolyDegN_DM(1,1,1),0:PolyDegN_DM(2,1,1),1:TotNum_DM)
-      real(kind=8):: res(0:PolyDegN_DM(1,1,1),0:PolyDegN_DM(2,1,1),1:TotNum_DM)
-      real(kind=8):: tmp(0:PolyDegN_DM(1,1,1),0:PolyDegN_DM(2,1,1),1:TotNum_DM)
+      integer:: i, j, k, s, iconv, iter, l, m
+      real(kind=8):: phi(0:PolyDegN_DM(1,1,l),0:PolyDegN_DM(2,1,l),1:TotNum_DM)
+      real(kind=8):: res(0:PolyDegN_DM(1,1,l),0:PolyDegN_DM(2,1,l),1:TotNum_DM)
+      real(kind=8):: tmp(0:PolyDegN_DM(1,1,l),0:PolyDegN_DM(2,1,l),1:TotNum_DM)
       real(kind=8):: tol,alpha,temp, rnorm, tolps, tolpss, ll
       real(kind=8):: glsc2
-      integer:: i, j, k, s, iconv, iter, l, m
 
       tmp = 0.d0
 
-      l = 1
       iter  = 0
       m     = lgmres ! FIXEME: You can define the size of m (Krylov subspce dimension)
 
@@ -23,7 +22,7 @@
 
       iconv = 0
 
-      Nx=PolyDegN_DM(1,1,1); Ny=PolyDegN_DM(2,1,1)
+      Nx=PolyDegN_DM(1,1,l); Ny=PolyDegN_DM(2,1,l)
 
       call chk_amax('res',res,Nx,Ny,l)
 
