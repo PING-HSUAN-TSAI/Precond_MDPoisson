@@ -22,7 +22,7 @@
       democase = PARAM(1)
       sovflag = PARAM(2)
       mg_lmax = PARAM(7)
-      write(*,*)'mg_lmax',mg_lmax
+      write(10,*)'mg_lmax',mg_lmax
       
 !     Initialize stage
 !-----Initialize universal constants
@@ -145,26 +145,27 @@
 
 !==================================================================
       else if (democase .eq. 3 ) then
-         call Construct_Lx_Ly_operator(1) !-Precondition.f90
+         call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
+         call Construct_Lx_Ly_operator(mg_lmax) !-Precondition.f90
          write(10,*)'Complete Constructing Lx Ly operator'
 
-         call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,1),TotNum_DM)
-         call Interp_mat
+         call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
+         call Interp_mat(mg_lmax)
          write(10,*)'Complete calling Interp_mat which set up & 
          Jhx and Jhy'
 
-         call alloc_mem_ovlapsmooth_var(PolyDegN_DM(1,1,1),TotNum_DM)
-         call Smoothing_Pack_Overlapping(LD1,LD2,1)
+         call alloc_mem_ovlapsmooth_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
+         call Smoothing_Pack_Overlapping(LD1,LD2,mg_lmax)
          write(10,*)'Complete Smoothing residue'
 
-         call CG (potent,x_vc,rhs,1,iterNum,1e-16)!--CG_Pack.f90
+         call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-16)!--CG_Pack.f90
          write(10,*)'Complete Operating Conjugate Gradient'
 !================================================================
       else if (democase .eq. 4) then
          Nk = param(5)
          write(10,*)'Total number of projection iteration:',Nk
       
-      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM)
+      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM,mg_lmax)
          call Construct_Lx_Ly_operator(1) !-Precondition.f90
          write(10,*)'Complete Constructing Lx Ly operator'
 
@@ -183,25 +184,25 @@
          call copy(potent,x_precond,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1),1)
 !==================================================================
       else if (democase .eq. 5) then
-      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM)
-         call Construct_Lx_Ly_operator(1) !-Precondition.f90
+      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
+         call Construct_Lx_Ly_operator(mg_lmax) !-Precondition.f90
 !         write(10,*)'Complete Constructing Lx Ly operator'
 
-         call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,1),TotNum_DM)
-         call Interp_mat
+         call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
+         call Interp_mat(mg_lmax)
          write(10,*)'Complete calling Interp_mat &
             which set up Jhx and Jhy'
 
-         call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1),TotNum_DM)
+         call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(2,1,mg_lmax),TotNum_DM)
          write(10,*)'Complet initializing GMRES variables'
 
 !         call hsmg_setup
-         call alloc_mem_wrapper_var(PolyDegN_DM(1,1,1),&
-         PolyDegN_DM(1,1,2),TotNum_DM,1)
+         call alloc_mem_wrapper_var(PolyDegN_DM(1,1,mg_lmax),&
+         PolyDegN_DM(1,1,mg_lmax-1),TotNum_DM,1)
 
          write(10,*)'Gmreswrapper',ND1,ND2
          call GMRES_WRAPPER(potent(0:ND1,0:ND2,1:TotNum_DM)&
-                           ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8)
+                           ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8,mg_lmax)
 !         call GMRES_CG_WRAPPER(potent(0:ND1,0:ND2,1:TotNum_DM)&
 !                           ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8)
          write(10,*)'Complete calling GMRES with preconditioning'
