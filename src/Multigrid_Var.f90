@@ -40,25 +40,25 @@
       real(kind=8), save, allocatable::  dudy_tmp(:,:,:)
       real(kind=8), save, allocatable::  lamx(:,:)
       real(kind=8), save, allocatable::  lamy(:,:)
-      real(kind=8), save, allocatable::  Lxx(:,:,:)
-      real(kind=8), save, allocatable::  Lyy(:,:,:)
-      real(kind=8), save, allocatable::  Bxx(:,:,:)
-      real(kind=8), save, allocatable::  Byy(:,:,:)
-      real(kind=8), save, allocatable::  lamxx(:,:)
-      real(kind=8), save, allocatable::  lamyy(:,:)
-      real(kind=8), save, allocatable::   bwxx(:,:)
-      real(kind=8), save, allocatable::   bwyy(:,:)
-      real(kind=8), save, allocatable::  Sxx_t(:,:,:)
-      real(kind=8), save, allocatable::  Sxx(:,:,:)
-      real(kind=8), save, allocatable::  Syy_t(:,:,:)
-      real(kind=8), save, allocatable::  Syy(:,:,:)
+      real(kind=8), save, allocatable::  Lxx(:,:,:,:)
+      real(kind=8), save, allocatable::  Lyy(:,:,:,:)
+      real(kind=8), save, allocatable::  Bxx(:,:,:,:)
+      real(kind=8), save, allocatable::  Byy(:,:,:,:)
+      real(kind=8), save, allocatable::  lamxx(:,:,:)
+      real(kind=8), save, allocatable::  lamyy(:,:,:)
+      real(kind=8), save, allocatable::   bwxx(:,:,:)
+      real(kind=8), save, allocatable::   bwyy(:,:,:)
+      real(kind=8), save, allocatable::  Sxx_t(:,:,:,:)
+      real(kind=8), save, allocatable::  Sxx(:,:,:,:)
+      real(kind=8), save, allocatable::  Syy_t(:,:,:,:)
+      real(kind=8), save, allocatable::  Syy(:,:,:,:)
       
       real(kind=8), save, allocatable::     z_ov(:,:,:)
       real(kind=8), save, allocatable:: z_ov_sol(:,:,:)
       real(kind=8), save, allocatable::   bwx(:,:)
       real(kind=8), save, allocatable::   bwy(:,:)
       real(kind=8), save, allocatable::   Diagonal(:,:)
-      real(kind=8), save, allocatable::   DDiagonal(:,:)
+      real(kind=8), save, allocatable::   DDiagonal(:,:,:)
       real(kind=8), save, allocatable::  Sx_t(:,:,:)
       real(kind=8), save, allocatable::  Sx(:,:,:)
       real(kind=8), save, allocatable::  Sy_t(:,:,:)
@@ -297,45 +297,45 @@
 
 
       end subroutine
-      subroutine alloc_mem_Lx_Ly_var(DegMax,TotNumDomain)
+      subroutine alloc_mem_Lx_Ly_var(DegMax,TotNumDomain,mg_len)
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
       integer:: ND1, ND2
       integer:: ND1p, ND2p
-      integer:: ierr,step
+      integer:: ierr,step,mg_len
 
       ND1 = DegMax(1); ND2 = DegMax(2);
       ND1p = ND1 + 1; ND2p = ND2 + 1;
       allocate(   Lx(0:ND1,0:ND1,1:TotNumDomain), &
                   Ly(0:ND2,0:ND2,1:TotNumDomain), &
-                  Lxx(0:ND1,0:ND1,1:TotNumDomain), &
-                  Lyy(0:ND2,0:ND2,1:TotNumDomain), &
+                  Lxx(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Lyy(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
                   Bx(0:ND1,0:ND1,1:TotNumDomain), &
                   By(0:ND2,0:ND2,1:TotNumDomain), &
-                  Bxx(0:ND1,0:ND1,1:TotNumDomain), &
-                  Byy(0:ND2,0:ND2,1:TotNumDomain), &
+                  Bxx(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Byy(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
                   dudx_tmp(0:ND1,0:ND1,1:TotNumDomain), &
                   dudy_tmp(0:ND2,0:ND2,1:TotNumDomain), &
                   lamx(0:ND1,1:TotNumDomain), &
                   lamy(0:ND2,1:TotNumDomain), &
-                  lamxx(0:ND1,1:TotNumDomain), &
-                  lamyy(0:ND2,1:TotNumDomain), &
+                  lamxx(0:ND1,1:TotNumDomain,mg_len), &
+                  lamyy(0:ND2,1:TotNumDomain,mg_len), &
                   bwx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
                   bwy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
-                  bwxx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
-                  bwyy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
+                  bwxx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
+                  bwyy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
                   Diagonal(1:(ND1+1)*(ND2+1),1:TotNumDomain), &
-                  DDiagonal(1:(ND1+1)*(ND2+1),1:TotNumDomain), &
+                  DDiagonal(1:(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
                   scale_c(1:(ND1+1)*(ND2+1),1:TotNumDomain), &
                   Sx_t(0:ND1,0:ND1,1:TotNumDomain), &
                   Sy_t(0:ND2,0:ND2,1:TotNumDomain), &
                   Sx(0:ND1,0:ND1,1:TotNumDomain), &
                   Sy(0:ND2,0:ND2,1:TotNumDomain), &
-                  Sxx_t(0:ND1,0:ND1,1:TotNumDomain), &
-                  Syy_t(0:ND2,0:ND2,1:TotNumDomain), &
-                  Sxx(0:ND1,0:ND1,1:TotNumDomain), &
-                  Syy(0:ND2,0:ND2,1:TotNumDomain), &
+                  Sxx_t(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Syy_t(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
+                  Sxx(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Syy(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
                   Sx_t_norm(0:ND1,0:ND1,1:TotNumDomain), &
                   Sy_t_norm(0:ND2,0:ND2,1:TotNumDomain), &
                   Sx_norm(0:ND1,0:ND1,1:TotNumDomain), &
