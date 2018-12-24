@@ -3,4 +3,5 @@
 *.sh
 *.in
 *.text
+*domain*/
 
