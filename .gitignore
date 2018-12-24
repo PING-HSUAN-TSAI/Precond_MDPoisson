@@ -1,8 +1,12 @@
+# ignore .o file
 *.[o]
-#*
+# ignore .sh file
 *.sh
+# ignore .in file
 *.in
+# ignore text file
 *.text
+# ignore directory 
 *domain*/
 *mesh*/
 
