@@ -485,16 +485,18 @@
       end subroutine
       !===============================================================
       subroutine Smoothing_Pack(LD1,LD2,l)
+
       use constants
       use Legendre
       use MD2D_Grid
       use State_Var
       use CG_Var
       use Multigrid_Var
+
       implicit none
-      integer :: N_vcycle, m_smooth, LD1, LD2
-      integer :: vcycle, iterNumc, method, ind_JS
-      integer :: k, i, j, n, ND1p, ND2p,l, ND1c, ND2c, Nx, Ny
+      integer      :: N_vcycle, m_smooth, LD1, LD2
+      integer      :: vcycle, iterNumc, method, ind_JS
+      integer      :: k, i, j, n, ND1p, ND2p,l, ND1c, ND2c, Nx, Ny
       real(kind=8) :: smoothpar
       real(kind=8) :: x_vc_ini(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: error_vc(0:LD1,0:LD2,1:TotNum_DM)
