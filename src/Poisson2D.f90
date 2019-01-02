@@ -107,7 +107,7 @@
 
             call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,mg_lmax)&
             ,PolyDegN_DM(2,1,mg_lmax),TotNum_DM)
-            write(10,*)'Complet initializing GMRES variables'
+            write(10,*)'Complete Initializing GMRES variables'
 
             call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),cg_ini(0:ND1,0:ND2,1:TotNum_DM)&
             ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-10,mg_lmax)!--HMH_GMRES.f90

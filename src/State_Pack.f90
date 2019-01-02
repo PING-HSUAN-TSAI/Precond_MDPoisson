@@ -101,7 +101,7 @@
       
       c_sigma(1) = param(34)
       c_sigma(2) = param(35)
-      write(10,*)'c_sigma:',c_sigma(1),c_sigma(2)
+      write(10,*)'Interface Parameters:',c_sigma(1),c_sigma(2)
 
       do l=mgl,1,-1
          do DDK = 1, TotNum_DM
@@ -208,7 +208,7 @@
       real(kind=8):: omega, denum, OmegaSurr,OmegaSelf
       
       c_tau = param(33)
-      write(10,*)'c_tau:',c_tau
+      write(10,*)'Dirichlet BC Parameter:',c_tau
       
       do l = mgl,1,-1
          do DDK = 1, TotNum_DM
