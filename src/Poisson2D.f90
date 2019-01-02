@@ -10,8 +10,8 @@
       use INPUT
       implicit none
       
-      integer:: i, j, sovflag, ierr
-      integer:: iterNum, tot_size, LD1, LD2, n
+      integer :: i, j, sovflag, ierr
+      integer :: iterNum, tot_size, LD1, LD2, n
 
       OPEN (UNIT=10,FILE='logfile')
       OPEN (UNIT=9,FILE='pspm2d.rea',STATUS='OLD',iostat=ierr)
@@ -94,25 +94,26 @@
       LD1 = PolyDegN_DM(1,1,mg_lmax); LD2 = PolyDegN_DM(2,1,mg_lmax)
       n = (PolyDegN_DM(1,1,mg_lmax) + 1)**2 * TotNum_DM
 
+
+
       if (democase .eq. 1) then
+         
+         call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
+!         write(10,*)'Complete Initializing Iterative Solver variables'
 
          if (sovflag .eq. 1) then
 
-            call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
-            write(10,*)'Complete Initializing CG variables'
       
-            call CG (potent,cg_ini,rhs,mg_lmax,iterNum,1e-16) !--CG_Pack.f90
+            call CG (potent,x_init,rhs,mg_lmax,iterNum,1e-16) !--CG_Pack.f90
             write(10,*)'Complete Operating Conjugate Gradient'
 
          else if (sovflag .eq. 2) then
-
-            call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
 
             call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,mg_lmax)&
             ,PolyDegN_DM(2,1,mg_lmax),TotNum_DM)
             write(10,*)'Complete Initializing GMRES variables'
 
-            call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),cg_ini(0:ND1,0:ND2,1:TotNum_DM)&
+            call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),x_init(0:ND1,0:ND2,1:TotNum_DM)&
             ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-10,mg_lmax) !--HMH_GMRES.f90
 
          endif
@@ -148,7 +149,7 @@
 !         enddo
 !         enddo
 
-            call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),cg_ini(0:ND1,0:ND2,1:TotNum_DM),&
+            call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),x_init(0:ND1,0:ND2,1:TotNum_DM),&
                rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8,mg_lmax) !--HMH_GMRES.f90
          endif      
 
