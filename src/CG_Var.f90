@@ -5,14 +5,11 @@
 !      real(kind=8), save  :: beta_cg, alpha_cg
 !      real(kind=8), save  :: rsold, rsnew, pAp, error_cg,rsnew1
 
-      real(kind=8), public, save, allocatable::  U_CG(:,:,:)
-      real(kind=8), save, allocatable::  cg_ini(:,:,:)
+      real(kind=8), save, allocatable::  x_init(:,:,:)
 !      real(kind=8), save, allocatable::  Ap(:,:,:)
 !      real(kind=8), save, allocatable::  Ax(:,:,:)
 !      real(kind=8), save, allocatable::  r(:,:,:)
 !      real(kind=8), save, allocatable::  p(:,:,:),z(:,:,:)
-      real(kind=8), save, allocatable::  laplace_x(:,:,:)
-      real(kind=8), save, allocatable::  error_veccg(:,:,:)
       contains
       !---------------------------------------------------------
       subroutine Init_CG(DegMax,TotNum_DM,iterNum)
@@ -25,10 +22,7 @@
       N_max=maxval(DegMax(1:2))
       ND1=DegMax(1); ND2=DegMax(2)
 
-      allocate( laplace_x(0:ND1,0:ND2,1:TotNum_DM), &
-                     U_CG(0:ND1,0:ND2,1:TotNum_DM), &
-                   cg_ini(0:ND1,0:ND2,1:TotNum_DM), &
-              error_veccg(0:ND1,0:ND2,1:TotNum_DM), &
+      allocate( x_init(0:ND1,0:ND2,1:TotNum_DM), &
 !                       Ax(0:ND1,0:ND2,1:TotNum_DM), &
 !                       Ap(0:ND1,0:ND2,1:TotNum_DM), &
 !                        r(0:ND1,0:ND2,1:TotNum_DM), &
@@ -42,10 +36,7 @@
          stop
       endif
 
-      U_CG=0.d0 
-      laplace_x=0.0d0
-      cg_ini=0.0d0
-      error_veccg=0.0d0
+      x_init=0.0d0
 
 !      Ax=0.0d0;
 !      rsnew=0.d0; rsold=0.d0; r=0.0d0; 
