@@ -95,14 +95,17 @@
       n = (PolyDegN_DM(1,1,mg_lmax) + 1)**2 * TotNum_DM
 
       if (democase .eq. 1) then
+
          if (sovflag .eq. 1) then
+
             call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
             write(10,*)'Complete Initializing CG variables'
       
-            call CG (potent,cg_ini,rhs,mg_lmax,iterNum,1e-16)!--CG_Pack.f90
+            call CG (potent,cg_ini,rhs,mg_lmax,iterNum,1e-16) !--CG_Pack.f90
             write(10,*)'Complete Operating Conjugate Gradient'
 
          else if (sovflag .eq. 2) then
+
             call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
 
             call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,mg_lmax)&
@@ -110,10 +113,12 @@
             write(10,*)'Complete Initializing GMRES variables'
 
             call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),cg_ini(0:ND1,0:ND2,1:TotNum_DM)&
-            ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-10,mg_lmax)!--HMH_GMRES.f90
+            ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-10,mg_lmax) !--HMH_GMRES.f90
+
          endif
       
       else if (democase .eq. 2) then
+
          call Construct_ML_operator(LD1,LD2,n,mg_lmax) !--Precondition.f90
          write(10,*)'Complete Constructing ML operator'
 
@@ -127,10 +132,12 @@
          call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
 
          if (sovflag .eq. 1) then
-            call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-20)!--CG_Pack.f90
+
+            call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-20) !--CG_Pack.f90
             write(10,*)'Complete Operating Conjugate Gradient'
 
          else if (sovflag .eq. 2) then
+
             call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(2,1,mg_lmax),TotNum_DM)
             write(10,*)'Complet initializing GMRES variables'
 !                     do DDK =1, TotNum_DM
@@ -142,11 +149,12 @@
 !         enddo
 
             call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),cg_ini(0:ND1,0:ND2,1:TotNum_DM),&
-               rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8,mg_lmax)!--HMH_GMRES.f90
+               rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8,mg_lmax) !--HMH_GMRES.f90
          endif      
 
 !==================================================================
       else if (democase .eq. 3 ) then
+
          call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
          call Construct_Lx_Ly_operator(mg_lmax) !-Precondition.f90
          write(10,*)'Complete Constructing Lx Ly operator'
@@ -160,14 +168,15 @@
          call Smoothing_Pack_Overlapping(LD1,LD2,mg_lmax)
          write(10,*)'Complete Smoothing residue'
 
-         call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-16)!--CG_Pack.f90
+         call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-16) !--CG_Pack.f90
          write(10,*)'Complete Operating Conjugate Gradient'
 !================================================================
       else if (democase .eq. 4) then
+
          Nk = param(5)
          write(10,*)'Total number of projection iteration:',Nk
       
-      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM,mg_lmax)
+         call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM,mg_lmax)
          call Construct_Lx_Ly_operator(1) !-Precondition.f90
          write(10,*)'Complete Constructing Lx Ly operator'
 
@@ -186,7 +195,8 @@
          call copy(potent,x_precond,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1),1)
 !==================================================================
       else if (democase .eq. 5) then
-      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
+
+         call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
          call Construct_Lx_Ly_operator(mg_lmax) !-Precondition.f90
 !         write(10,*)'Complete Constructing Lx Ly operator'
 
@@ -210,6 +220,7 @@
          write(10,*)'Complete calling GMRES with preconditioning'
 
       end if ! democase
+
       close(9)
       call Field_Final(1)
 
