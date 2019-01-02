@@ -76,7 +76,7 @@
       !close(74)
       !close(90)
       
-      write(10,fmt="(A10,es24.15)")'Max error:',error_max
+      write(10,fmt="(A10,es24.15)")' Max error:',error_max
       write(93,1001) gridmax,error_max
       close(93)
       
@@ -107,6 +107,6 @@
 1000 format(9e23.15)      
 1001 format(I3,es24.15)
 !1002 format(I5,A2,e24.15)
-1003 format(A6,1x,I0.3,1x,A6,es24.15)
+1003 format(' ',A6,1x,I0.3,1x,A6,es24.15)
      return
      end subroutine Error_Computing

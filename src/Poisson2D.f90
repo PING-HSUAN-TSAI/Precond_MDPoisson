@@ -31,6 +31,7 @@
 !-----Initialize Domain Parameter 
       call Input_Domain_Grid_Parameters(mg_lmax)        !-- MD2D_Grid.f90
       write(10,*)'Complete Initializing Grid Parameters'
+
       call Geometric_Parameters_On_Screen(mg_lmax)     !-- MD2D_Grid.f90
       
 !-----Initialize Legendre Pseudospectral Module
@@ -55,7 +56,6 @@
       call Init_Physical_Grid_2D(mg_lmax) !-- Grid2D_Pack.f90
       write(10,*)'Complete Initializing Grid points'
       
-
 !     Initialize Metric variables
       call Init_Metric(mg_lmax) !-- Grid2D_Pack.f90
            
@@ -74,8 +74,10 @@
       call Init_BC_Variables(mg_lmax) !-- State_Pack.f90
       write(10,*)'Complete Initializing Variables for &
                    Boundary Condition'
+
       call Initial_Field(mg_lmax) !--State_Pack.f90
       write(10,*)'Complete Initializing Initial Field'
+
       call FluxComp(mg_lmax) !--State_Pack.f90
       write(10,*)'Complete Flux computing'
 
@@ -95,7 +97,7 @@
       if (democase .eq. 1) then
          if (sovflag .eq. 1) then
             call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
-            write(10,*)'Complet initializing CG variables'
+            write(10,*)'Complete Initializing CG variables'
       
             call CG (potent,cg_ini,rhs,mg_lmax,iterNum,1e-16)!--CG_Pack.f90
             write(10,*)'Complete Operating Conjugate Gradient'

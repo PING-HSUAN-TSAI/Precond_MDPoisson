@@ -275,7 +275,7 @@ contains
 204 format(A32,1x,i4)
 205 format(A32,1x,i4,1x,i4,1x,i4)
 207 format(1x,i5,1x,i5)
-208 format(' ',' ','l',I0.3,'DDK:',I0.3,1x,'Nc:',I0.3,1x,I0.3)
+208 format(' ',' ','l ',I0.3,' DDK: ',I0.3,1x,'Nc: ',I0.3,1x,I0.3)
 
   end subroutine Geometric_parameters_On_Screen
 
