@@ -122,7 +122,7 @@
 
          call Smoothing_Pack(LD1,LD2,mg_lmax)
          write(10,*)'Complete Smoothing residue'
-            call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
+         call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
 
          if (sovflag .eq. 1) then
             call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-20)!--CG_Pack.f90
