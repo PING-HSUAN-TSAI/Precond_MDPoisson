@@ -7,7 +7,8 @@
       implicit none
       
       integer :: i,j,k,error_loc,gridmax,grid
-      integer ::mgl
+      integer :: mgl
+      real(kind=8) :: U_CG(0:PolyDegN_DM(1,1,mgl),0:PolyDegN_DM(2,1,mgl),1:TotNum_DM) 
       !  real(kind=8) :: error_iter(1:count)
       
       gridmax=0.0
