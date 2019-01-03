@@ -121,7 +121,7 @@
       else if (democase .eq. 2) then
 
          call Construct_ML_operator(LD1,LD2,n,mg_lmax) !--Precondition.f90
-         write(10,*)'Complete Constructing ML operator'
+         write(10,*)'Complete Constructing ML Operator'
 
          call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
          call Interp_mat(mg_lmax)
@@ -129,7 +129,8 @@
          Jhx and Jhy'
 
          call Smoothing_Pack(LD1,LD2,mg_lmax)
-         write(10,*)'Complete Smoothing residue'
+         write(10,*)'Complete Smoothing Residue'
+
          call Init_CG(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,iterNum)
 
          if (sovflag .eq. 1) then
@@ -140,8 +141,8 @@
          else if (sovflag .eq. 2) then
 
             call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(2,1,mg_lmax),TotNum_DM)
-            write(10,*)'Complet initializing GMRES variables'
-!                     do DDK =1, TotNum_DM
+            write(10,*)'Complete Initializing GMRES Variables'
+!         do DDK =1, TotNum_DM
 !         do j=0,ND2
 !         do i=0,ND1
 !         write(*,*)'x_vc_beforegmres',i,j,DDK,x_vc(i,j,DDK)

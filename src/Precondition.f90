@@ -483,7 +483,7 @@
       enddo ! DDK
       
       end subroutine
-      !===============================================================
+!---------------------------------------------------------------
       subroutine Smoothing_Pack(LD1,LD2,l)
 
       use constants
@@ -509,12 +509,11 @@
 
       call alloc_mem_jacobismooth_var(PolyDegN_DM(1,1,l),TotNum_DM)
 
-      N_vcycle = 1
-      m_smooth = 1
+      N_vcycle  = 1
+      m_smooth  = 1
       smoothpar = 2.d0/3.d0
 
-      
-!================================================================================
+!--------------------------------------------------------------------------------
 !     Construct Jacobi-smoothing matrix
 !      open(347,file='M.text')
       
@@ -549,7 +548,7 @@
          call chk_amax('xvc',x_vc,Nx,Ny,l)
          call chk_amax('bJr',r_smooth,Nx,Ny,l)
 
-!     Jacobi smoothing
+!        Jacobi smoothing
          do k = 1,m_smooth
 
             do DDK = 1, TotNum_DM
@@ -564,14 +563,14 @@
                x_vc(0:ND1,0:ND2,DDK) = x_vc(0:ND1,0:ND2,DDK) &
                                      + smoothpar * Mr(0:ND1,0:ND2,DDK)
             enddo !DDK
-         call chk_amax('xas',x_vc,Nx,Ny,l)
+            call chk_amax('xas',x_vc,Nx,Ny,l)
 
             call axhelm2(Nx,Ny,x_vc,Ax_vc,l)
             call add3s2(r_smooth,b_smooth,Ax_vc,1.0,-1.0,Nx,Ny,l)
 
          enddo ! smooth
       
-!     Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
+!        Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
       
          do DDK = 1 ,TotNum_DM
             ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
@@ -592,9 +591,12 @@
             iterNumc = iterNumc + (PolyDegN_DM(1,DDK,l-1)+1) &
                                    * (PolyDegN_DM(2,DDK,l-1)+1)
          enddo
+
          call chk_amax('xci',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)   
+
          call CG(ec(0:ND1c,0:ND2c,1:TotNum_DM),xc_in(0:ND1c,0:ND2c,1:TotNum_DM),&
          rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),1,iterNumc,1e-20)
+
          call chk_amax('ecg',ec,ND1c,ND2c,l-1)
          call chk_amax('rcc',rc_smooth,ND1c,ND2c,l-1)
       
@@ -624,8 +626,8 @@
 !         enddo
 !         enddo
       
-         enddo ! vcycle
-         write(10,*)'End cycle'
+      enddo ! vcycle
+      write(10,*)'End cycle'
       
       end subroutine Smoothing_Pack
       !===============================================================================
