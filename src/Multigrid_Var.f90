@@ -1,4 +1,5 @@
       module Multigrid_Var
+
       implicit none
       
 !     Allocate variables for ML operator
@@ -101,8 +102,9 @@
       integer :: mg_nh(1:3)
 
       contains
-!======================================================================      
+!----------------------------------------------------------------------      
       subroutine alloc_mem_wrapper_var(DegMax,DegNcMax,TotNumDomain,step)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -123,15 +125,16 @@
                           w(0:ND1,0:ND2,1:TotNumDomain), &
                   Pap_pcond(0:ND1,0:ND2,1:TotNumDomain), &
                    pc_proAp(1:step), &
-                        ef(0:ND1,0:ND2,1:TotNumDomain), &
-                      x_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                     Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                      z_ov(0:ND1,0:ND2,1:TotNumDomain), &
-                     z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
+                         ef(0:ND1,0:ND2,1:TotNumDomain), &
+                       x_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                      Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                       z_ov(0:ND1,0:ND2,1:TotNumDomain), &
+                    z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
                      stat = ierr)
+
       allocate(   xc_in(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
-                        ec(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
-                     rc_smooth(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
+                     ec(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
+              rc_smooth(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
                      stat = ierr)
 
       if (ierr .ne. 0 ) then
@@ -154,8 +157,9 @@
       
       end subroutine alloc_mem_wrapper_var
       
-      !=============================================================================
+!----------------------------------------------------------------------      
       subroutine alloc_mem_MLoperator_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -180,6 +184,7 @@
 
       end subroutine 
       subroutine alloc_mem_jacobismooth_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -217,7 +222,9 @@
 
 
       end subroutine
+!----------------------------------------------------------------------      
       subroutine alloc_mem_Interpolatematrix_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -227,22 +234,23 @@
 
       ND1 = DegMax(1); ND2 = DegMax(2);
       ND1p = ND1 + 1; ND2p = ND2 + 1;
-      allocate(Ihx(0:ND1,0:ND1,1:TotNumDomain), &
-                       Ihy(0:ND2,0:ND2,1:TotNumDomain), &
-             Ihx_transpose(0:ND1,0:ND1,1:TotNumDomain), &
-             Ihy_transpose(0:ND2,0:ND2,1:TotNumDomain), &
-                  mg_jh(0:ND2,0:ND2,1:3), &
-               mg_jht(0:ND1,0:ND1,1:3), &
-               mg_jhfc(0:ND2,0:ND2,1:3), &
-               mg_jhfct(0:ND2,0:ND2,1:3), &
-               mg_zh(0:ND1,1:3), &
-                        xo(0:ND1,1:TotNumDomain), &
-                        xi(0:ND1,1:TotNumDomain), &
-                        yo(0:ND2,1:TotNumDomain), &
-                        yi(0:ND2,1:TotNumDomain), &
-                        wx(0:ND1,1:2,1:TotNumDomain), &
-                        wy(0:ND2,1:2,1:TotNumDomain), &
-               stat=ierr)
+
+      allocate( Ihx(0:ND1,0:ND1,1:TotNumDomain), &
+                Ihy(0:ND2,0:ND2,1:TotNumDomain), &
+                Ihx_transpose(0:ND1,0:ND1,1:TotNumDomain), &
+                Ihy_transpose(0:ND2,0:ND2,1:TotNumDomain), &
+                mg_jh(0:ND2,0:ND2,1:3), &
+                mg_jht(0:ND1,0:ND1,1:3), &
+                mg_jhfc(0:ND2,0:ND2,1:3), &
+                mg_jhfct(0:ND2,0:ND2,1:3), &
+                mg_zh(0:ND1,1:3), &
+                xo(0:ND1,1:TotNumDomain), &
+                xi(0:ND1,1:TotNumDomain), &
+                yo(0:ND2,1:TotNumDomain), &
+                yi(0:ND2,1:TotNumDomain), &
+                wx(0:ND1,1:2,1:TotNumDomain), &
+                wy(0:ND2,1:2,1:TotNumDomain), &
+                stat=ierr)
 
       if (ierr .ne. 0 ) then
          write(*,*)'Cannot allocate memory for Interpolate matrix &
@@ -261,7 +269,9 @@
       mg_jhfc=0.d0; mg_jhfct=0.d0
       mg_zh=0.d0
       end subroutine
+!----------------------------------------------------------------------      
       subroutine alloc_mem_ovlapsmooth_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -272,15 +282,15 @@
       ND1 = DegMax(1); ND2 = DegMax(2);
       ND1p = ND1 + 1; ND2p = ND2 + 1;
       allocate(  r_smooth(0:ND1,0:ND2,1:TotNumDomain), &
-                  rc_smooth(0:ND1,0:ND2,1:TotNumDomain), &
-                  b_smooth(0:ND1,0:ND2,1:TotNumDomain), &
-                     xc_in(0:ND1,0:ND2,1:TotNumDomain), &
-                        ec(0:ND1,0:ND2,1:TotNumDomain), &
-                        ef(0:ND1,0:ND2,1:TotNumDomain), &
-                      x_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                     Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                      z_ov(0:ND1,0:ND2,1:TotNumDomain), &
-                     z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
+                rc_smooth(0:ND1,0:ND2,1:TotNumDomain), &
+                 b_smooth(0:ND1,0:ND2,1:TotNumDomain), &
+                    xc_in(0:ND1,0:ND2,1:TotNumDomain), &
+                       ec(0:ND1,0:ND2,1:TotNumDomain), &
+                       ef(0:ND1,0:ND2,1:TotNumDomain), &
+                     x_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                    Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                     z_ov(0:ND1,0:ND2,1:TotNumDomain), &
+                 z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
                stat=ierr)
 
       if (ierr .ne. 0 ) then
@@ -298,7 +308,9 @@
 
 
       end subroutine
+!----------------------------------------------------------------------      
       subroutine alloc_mem_Lx_Ly_var(DegMax,TotNumDomain,mg_len)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -346,6 +358,7 @@
                   SxBSx(0:ND1,0:ND1,1:TotNumDomain), &
                   SyBSy(0:ND2,0:ND2,1:TotNumDomain), &
                   stat=ierr)
+
       if (ierr .ne. 0 ) then
          write(*,*)'Cannot allocate memory for Lx and Ly variables'
          write(*,*)'Abort!'
@@ -377,7 +390,9 @@
 
       scale_c = 1.d0
       end subroutine
+!----------------------------------------------------------------------      
       subroutine Initial_I_U(DegDM,TotNumDomain)
+
       implicit none
       integer:: DegDM(2,TotNumDomain)
       integer:: TotNumDomain
