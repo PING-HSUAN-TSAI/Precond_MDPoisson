@@ -548,6 +548,8 @@
          call chk_amax('xvc',x_vc,Nx,Ny,l)
          call chk_amax('bJr',r_smooth,Nx,Ny,l)
 
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),1,'bJr')
+
 !        Jacobi smoothing
          do k = 1,m_smooth
 
@@ -568,7 +570,10 @@
             call axhelm2(Nx,Ny,x_vc,Ax_vc,l)
             call add3s2(r_smooth,b_smooth,Ax_vc,1.0,-1.0,Nx,Ny,l)
 
+            call chk_amax('aJr',r_smooth,Nx,Ny,l)
          enddo ! smooth
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),1,'aJr')
+
       
 !        Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
       
