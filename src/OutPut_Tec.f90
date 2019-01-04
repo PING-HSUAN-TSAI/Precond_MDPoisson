@@ -166,3 +166,34 @@
 1001 format(9e24.15,1x)
 
       end subroutine 
+!----------------------------------------------------------
+      subroutine outpost(vtmp,level,name3)
+      use MD2D_Grid
+
+      implicit none
+      integer :: i,j,level
+      integer :: ii
+      real(kind=8) :: vtmp(1)
+      character*3 name3
+      character*7 filename
+
+      write(filename,fmt="(A3,A4)") name3,".dat"
+      open(999,file=filename)
+      write(999,*)'VARIABLES = "X", "Y", "Z", "U"'
+
+      do DDK=1,TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,level);ND2=PolyDegN_DM(2,DDK,level)
+         write(999,fmt="(A7,I5,A4,I5,A4,I5,A9,1x)") 'ZONE I=', ND1+1, &
+         ', J=', ND2+1, ', K=', 1,', F=POINT'
+         do j=0,ND2
+            do i=0,ND1
+               ii = (DDK-1)*(ND2+1)*(ND1+1) + (i+1) + j*(ND1+1)
+               write(999,1002) x1(i,j,DDK,level),x2(i,j,DDK,level), &
+                               vtmp(ii),vtmp(ii)
+            enddo ! i
+         enddo ! j
+      enddo ! DDK
+      close(999)
+      
+1002 format(9e24.15,1x)
+      end subroutine
