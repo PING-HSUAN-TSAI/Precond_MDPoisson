@@ -505,6 +505,8 @@
       real(kind=8) :: tmp4(0:LD1,0:LD2,1:TotNum_DM),tmp5(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp6(0:LD1,0:LD2,1:TotNum_DM)
 
+      write(10,*)'l in smoothing_Pack',l
+
       Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
 
       call alloc_mem_jacobismooth_var(PolyDegN_DM(1,1,l),TotNum_DM)
@@ -548,7 +550,7 @@
          call chk_amax('xvc',x_vc,Nx,Ny,l)
          call chk_amax('bJr',r_smooth,Nx,Ny,l)
 
-         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),1,'bJr')
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),l,'bJr')
 
 !        Jacobi smoothing
          do k = 1,m_smooth
@@ -572,7 +574,7 @@
 
             call chk_amax('aJr',r_smooth,Nx,Ny,l)
          enddo ! smooth
-         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),1,'aJr')
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),l,'aJr')
 
       
 !        Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
@@ -600,7 +602,7 @@
          call chk_amax('xci',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)   
 
          call CG(ec(0:ND1c,0:ND2c,1:TotNum_DM),xc_in(0:ND1c,0:ND2c,1:TotNum_DM),&
-         rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),1,iterNumc,1e-20)
+         rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),l-1,iterNumc,1e-20)
 
          call chk_amax('ecg',ec,ND1c,ND2c,l-1)
          call chk_amax('rcc',rc_smooth,ND1c,ND2c,l-1)
@@ -618,9 +620,13 @@
       
          call add2s2(x_vc,ef,1.0,Nx,Ny,l)
 
+         call outpost(x_vc(0:ND1,0:ND2,1:TotNum_DM),l,'xvc')
+
+!        v is exact solution
          call add3s2(error_vc,v,x_vc,1.0,-1.0,Nx,Ny,l)
      
          call chk_amax('ers',error_vc,Nx,Ny,l)
+         call outpost(error_vc(0:ND1,0:ND2,1:TotNum_DM),l,'evc')
          call copy(x_vc_ini,x_vc,Nx,Ny,l)
 
 !         do DDK =1, TotNum_DM
