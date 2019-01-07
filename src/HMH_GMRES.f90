@@ -30,6 +30,7 @@
          gmres_x(i) = x(i)
       enddo
       
+      
       do j=1,m
          do i =1,m
             gmres_h(i,j) = 0
@@ -45,7 +46,14 @@
             do i=1,n
                gmres_r(i) = res(i) ! r = res
             enddo                
-          else
+            call axhelm2(ND1,ND2,gmres_x(1:n),&
+                  gmres_w(1:n),mgl) ! w = Ax
+!     Compute initial residual
+!     r = r - w
+            do i=1,n
+               gmres_r(i) = gmres_r(i) - gmres_w(i)
+            enddo
+         else
 !     update residual
             do i =1,n
                gmres_r(i) = res(i) ! r = res
@@ -59,17 +67,17 @@
             enddo
          endif
 
-!     gamma  = (r,r)
+!     gmres_gamma  = (r,r)
 !     Compute initial residual norm
 
-         call inner_product(ND1,ND2,gmres_r(1:n),gmres_r(1:n),gamma(1),mgl)
-         gamma(1) = sqrt(gamma(1))  ! gamma  = sqrt{ (r,r) }
+         call inner_product(ND1,ND2,gmres_r(1:n),gmres_r(1:n),gmres_gamma(1),mgl)
+         gmres_gamma(1) = sqrt(gmres_gamma(1))  ! gamma  = sqrt{ (r,r) }
                                     !      1
       
 !     check for lucky convergence
          rnorm = 0.
-         if(gamma(1) .eq. 0.) goto 9000
-         temp = 1./gamma(1)
+         if(gmres_gamma(1) .eq. 0.) goto 9000
+         temp = 1./gmres_gamma(1)
       
 !     Define first Krylov vector
 !     v  = r / gamma
@@ -115,11 +123,11 @@
             gmres_c(j) = gmres_h(j,j) * temp
             gmres_s(j) = alpha  * temp
             gmres_h(j,j) = l
-            gamma(j+1) = -gmres_s(j) * gamma(j)
-            gamma(j)   =  gmres_c(j) * gamma(j)
+            gmres_gamma(j+1) = -gmres_s(j) * gmres_gamma(j)
+            gmres_gamma(j)   =  gmres_c(j) * gmres_gamma(j)
       
       
-            rnorm = abs(gamma(j+1))!*norm_fac
+            rnorm = abs(gmres_gamma(j+1))!*norm_fac
       
             if (rnorm .lt. tolps) goto 900 !converged
             if (j.eq.m) goto 1000 !not converged, restart
@@ -141,7 +149,7 @@
 !        c = H   gamma
       
          do k=j,1,-1
-            temp = gamma(k)
+            temp = gmres_gamma(k)
             do i=j,k+1,-1
                temp = temp - gmres_h(k,i)*gmres_c(i)
             enddo
