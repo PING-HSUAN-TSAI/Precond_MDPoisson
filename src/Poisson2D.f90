@@ -114,10 +114,12 @@
             write(10,*)'Complete Initializing GMRES variables'
 
             call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),x_init(0:ND1,0:ND2,1:TotNum_DM)&
-            ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-10,mg_lmax) !--HMH_GMRES.f90
+            ,rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8,mg_lmax) !--HMH_GMRES.f90
 
          endif
       
+
+!     Iterative solver with zero initial guess requires less iteration to converge then using Jacobi smoothing - Fixed
       else if (democase .eq. 2) then
 
          call Construct_ML_operator(LD1,LD2,n,mg_lmax) !--Precondition.f90
@@ -135,23 +137,17 @@
 
          if (sovflag .eq. 1) then
 
-            call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-20) !--CG_Pack.f90
+            call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-16) !--CG_Pack.f90
             write(10,*)'Complete Operating Conjugate Gradient'
 
          else if (sovflag .eq. 2) then
 
             call alloc_gmres_var(tot_size,PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(2,1,mg_lmax),TotNum_DM)
             write(10,*)'Complete Initializing GMRES Variables'
-!         do DDK =1, TotNum_DM
-!         do j=0,ND2
-!         do i=0,ND1
-!         write(*,*)'x_vc_beforegmres',i,j,DDK,x_vc(i,j,DDK)
-!         enddo
-!         enddo
-!         enddo
 
-            call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),x_init(0:ND1,0:ND2,1:TotNum_DM),&
+            call HMH_GMRES(potent(0:ND1,0:ND2,1:TotNum_DM),x_vc(0:ND1,0:ND2,1:TotNum_DM),&
                rhs(0:ND1,0:ND2,1:TotNum_DM),tot_size,1e-8,mg_lmax) !--HMH_GMRES.f90
+
          endif      
 
 !==================================================================
