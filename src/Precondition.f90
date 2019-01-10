@@ -512,7 +512,7 @@
       call alloc_mem_jacobismooth_var(PolyDegN_DM(1,1,l),TotNum_DM)
 
       N_vcycle  = 1
-      m_smooth  = 1
+      m_smooth  = 5
       smoothpar = 2.d0/3.d0
 
 !--------------------------------------------------------------------------------
@@ -629,14 +629,6 @@
          call outpost(error_vc(0:ND1,0:ND2,1:TotNum_DM),l,'evc')
          call copy(x_vc_ini,x_vc,Nx,Ny,l)
 
-!         do DDK =1, TotNum_DM
-!         do j=0,Ny
-!         do i=0,Nx
-!         write(*,*)'x_vc',i,j,DDK,x_vc(i,j,DDK)
-!         enddo
-!         enddo
-!         enddo
-      
       enddo ! vcycle
       write(10,*)'End cycle'
       
@@ -941,11 +933,11 @@
       !
       
       end subroutine
-      !================================================================================
-      !-This subroutine is to construct the Lx and Ly operators which are in one
-      ! dimensional. This idea is from the paper "Hybrid Multigrid/Schwarz
-      ! Algorithms for the Spectral Element Method
+!--------------------------------------------------------------------------------
       subroutine Construct_Lx_Ly_operator(level)
+!     This subroutine is to construct the Lx and Ly operators which are in one
+!     dimensional. This idea is from the paper "Hybrid Multigrid/Schwarz
+!     Algorithms for the Spectral Element Method
       use Multigrid_Var
       use State_Var
       use constants
@@ -991,6 +983,8 @@
          Ly(0:ND2,0:ND2,DDK) = - Matmul(Diff_xi1(0:ND1,0:ND1,ND1), &
                                            dudy_tmp(0:ND2,0:ND2,DDK) )
       enddo
+      
+      call dumpopt(Lx,level,'Lwo')
 
 !      write(10,*)'L operator without penalty'
 !      do DDK=1,TotNum_DM
