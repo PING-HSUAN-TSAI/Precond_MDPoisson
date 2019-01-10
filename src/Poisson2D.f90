@@ -150,7 +150,7 @@
 
          endif      
 
-!==================================================================
+!------------------------------------------------------------------
       else if (democase .eq. 3 ) then
 
          call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
@@ -164,11 +164,11 @@
 
          call alloc_mem_ovlapsmooth_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
          call Smoothing_Pack_Overlapping(LD1,LD2,mg_lmax)
-         write(10,*)'Complete Smoothing residue'
+         write(10,*)'Complete Smoothing Residue'
 
          call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-16) !--CG_Pack.f90
          write(10,*)'Complete Operating Conjugate Gradient'
-!================================================================
+!----------------------------------------------------------------
       else if (democase .eq. 4) then
 
          Nk = param(5)
@@ -191,7 +191,7 @@
          method with preconditioning'
       
          call copy(potent,x_precond,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1),1)
-!==================================================================
+!------------------------------------------------------------------
       else if (democase .eq. 5) then
 
          call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
