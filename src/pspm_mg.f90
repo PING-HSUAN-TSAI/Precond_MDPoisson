@@ -19,21 +19,35 @@
       integer :: i,l,n
 
       mg_lmax = 3
+
+      if (mg_lmax == 3) then
       
-      mg_nx(1) = 1
-      mg_ny(1) = 1
-      mg_nz(1) = 1
+         mg_nx(1) = 1
+         mg_ny(1) = 1
+         mg_nz(1) = 1
 
 !      mg_nx(2) = 2
 !      mg_ny(2) = 2
 !      mg_nz(2) = 2
-      mg_nx(2) = PolyDegN_DM(1,1,1)/2 
-      mg_ny(2) = PolyDegN_DM(1,1,1)/2
-      mg_nz(2) = PolyDegN_DM(1,1,1)/2
+         mg_nx(2) = PolyDegN_DM(1,1,1)/2 
+         mg_ny(2) = PolyDegN_DM(1,1,1)/2
+         mg_nz(2) = PolyDegN_DM(1,1,1)/2
+   
+         mg_nx(3) = PolyDegN_DM(1,1,1) 
+         mg_ny(3) = PolyDegN_DM(1,1,1)
+         mg_nz(3) = PolyDegN_DM(1,1,1)
 
-      mg_nx(3) = PolyDegN_DM(1,1,1) 
-      mg_ny(3) = PolyDegN_DM(1,1,1)
-      mg_nz(3) = PolyDegN_DM(1,1,1)
+      else if (mg_lmax == 2) then
+
+         mg_nx(1) = PolyDegN_DM(1,1,1)/2 
+         mg_ny(1) = PolyDegN_DM(1,1,1)/2
+         mg_nz(1) = PolyDegN_DM(1,1,1)/2
+   
+         mg_nx(2) = PolyDegN_DM(1,1,1) 
+         mg_ny(2) = PolyDegN_DM(1,1,1)
+         mg_nz(2) = PolyDegN_DM(1,1,1)
+
+      endif
 
       write(10,*) 'mg_nx:',(mg_nx(i),i=1,mg_lmax)
       write(10,*) 'mg_ny:',(mg_ny(i),i=1,mg_lmax)
@@ -161,38 +175,10 @@
          select case (BC_Type(Edge_Num,DDK))
             case(0)
 
-!     add interface penalty : first set of dirichlet
-!            do j=0,ND2
-!               do i=0,ND1
-!                  n = i+1+j*(ND2+1)
-!                  scale_c(n,DDK) = scale_c(n,DDK) + 1
-!               enddo
-!            enddo
-
             do j=0,ND2
                n=0+1+j*(ND2+1)
                scale_c(n,DDK) = scale_c(n,DDK) + 1
             enddo
-!            do j=0,ND2
-!               Au(0:ND1,j,DDK) =  Au(0:ND1,j,DDK) &
-!                               +     tau1(0:ND1,j,Edge_Num,DDK,level)  &
-!                               *  BITF1(j,Edge_Num,DDK)
-!               Au(0,0:ND2,DDK) =  Au(0,0:ND2,DDK) &
-!                               +     tau3(j,0:ND2,Edge_Num,DDK,level) &
-!                               *  BITF1(j,Edge_Num,DDK)
-!            enddo
-
-!            Au(0,0:ND2,DDK) =   Au(0,0:ND2,DDK) &
-!                            +      tau2(0:ND2,Edge_Num,DDK,level) &
-!                            *   BITF1(0:ND2,Edge_Num,DDK)
-!!     add interface penalty : second set of dirichlet
-!            Au(0,0:ND2,DDK) =      Au(0,0:ND2,DDK) &
-!                            +   Sigma_tild(0:ND2,Edge_Num,DDK,level) &
-!                            *      BITF1(0:ND2,Edge_Num,DDK)
-!!     add interface penalty : neumann
-!            Au(0,0:ND2,DDK) =  Au(0,0:ND2,DDK) &
-!                            + SigmaHat(0:ND2,Edge_Num,DDK,level) &
-!                            *  BITF2(0:ND2,Edge_Num,DDK)
 
          end select
       ! side 2
@@ -200,113 +186,29 @@
          select case (BC_Type(Edge_Num,DDK))
             case(0)
 
-!            do j=0,ND2
-!               do i=0,ND1
-!                  n = i+1+j*(ND2+1)
-!                  scale_c(n,DDK) = scale_c(n,DDK) + 1
-!               enddo
-!            enddo
-
             do j=0,ND2
                n=ND1+1+j*(ND2+1)
                scale_c(n,DDK) = scale_c(n,DDK) + 1
             enddo
-!     add interface penalty : first set of dirichlet
-!            do j=0,ND2
-!               Au(0:ND1,j,DDK) =  Au(0:ND1,j,DDK) &
-!                               +     tau1(0:ND1,j,Edge_Num,DDK,level)  &
-!                               *  BITF1(j,Edge_Num,DDK)
-!
-!               Au(ND1,0:ND2,DDK) =   Au(ND1,0:ND2,DDK) &
-!                                 + tau3(j,0:ND2,Edge_Num,DDK,level) &
-!                                 *  BITF1(j,Edge_Num,DDK)
-!            enddo
-!               Au(ND1,0:ND2,DDK) = Au(ND1,0:ND2,DDK) &
-!                                 +    tau2(0:ND2,Edge_Num,DDK,level) &
-!                                 * BITF1(0:ND2,Edge_Num,DDK)
-!!     add interface penalty : second set of dirichlet
-!               Au(ND1,0:ND2,DDK) =     Au(ND1,0:ND2,DDK) &
-!                                 +Sigma_tild(0:ND2,Edge_Num,DDK,level) &
-!                                 *     BITF1(0:ND2,Edge_Num,DDK)
-!!     add interface penalty : neumann
-!               Au(ND1,0:ND2,DDK) =  Au(ND1,0:ND2,DDK) &
-!                                 + SigmaHat(0:ND2,Edge_Num,DDK,level) &
-!                                 *  BITF2(0:ND2,Edge_Num,DDK)
          end select
       ! side 1
          Edge_Num=1
          select case (BC_Type(Edge_Num,DDK))
             case(0)
 
-!            do j=0,ND2
-!               do i=0,ND1
-!                  n = i+1+j*(ND2+1)
-!                  scale_c(n,DDK) = scale_c(n,DDK) + 1
-!               enddo
-!            enddo
-
             do i=0,ND1
                n=i+1+0*(ND2+1)
                scale_c(n,DDK) = scale_c(n,DDK) + 1
             enddo
-!     add interface penalty : first set of dirichlet
-!            do i=0,ND1
-!               Au(i,0:ND2,DDK) = Au(i,0:ND2,DDK) &
-!                               +    tau1(i,0:ND2,Edge_Num,DDK,level)  &
-!                               * BITF1(i,Edge_Num,DDK)
-!               Au(0:ND1,0,DDK) = Au(0:ND1,0,DDK) &
-!                               +    tau3(i,0:ND1,Edge_Num,DDK,level) &
-!                               * BITF1(i,Edge_Num,DDK)
-!            enddo
-!
-!            Au(0:ND1,0,DDK) = Au(0:ND1,0,DDK) &
-!                            +    tau2(0:ND1,Edge_Num,DDK,level) &
-!                            * BITF1(0:ND1,Edge_Num,DDK)
-!!     add interface penalty : second set of dirichlet
-!            Au(0:ND1,0,DDK) =    Au(0:ND1,0,DDK) &
-!                            + Sigma_tild(0:ND1,Edge_Num,DDK,level) &
-!                            *    BITF1(0:ND1,Edge_Num,DDK)
-!!     add interface penalty : neumann
-!            Au(0:ND1,0,DDK) =  Au(0:ND1,0,DDK) &
-!                            + SigmaHat(0:ND1,Edge_Num,DDK,level) &
-!                            *  BITF2(0:ND1,Edge_Num,DDK)
          end select
          Edge_Num=3
          select case (BC_Type(Edge_Num,DDK))
             case(0)
 
-!            do j=0,ND2
-!               do i=0,ND1
-!                  n = i+1+j*(ND2+1)
-!                  scale_c(n,DDK) = scale_c(n,DDK) + 1
-!               enddo
-!            enddo
-
             do i=0,ND1
                n=i+1+ND2*(ND2+1)
                scale_c(n,DDK) = scale_c(n,DDK) + 1
             enddo
-!     add interface penalty : first set of dirichlet
-!            do i=0,ND1
-!               Au(i,0:ND2,DDK) = Au(i,0:ND2,DDK) &
-!                               +    tau1(i,0:ND2,Edge_Num,DDK,level)  &
-!                               * BITF1(i,Edge_Num,DDK)
-!               Au(0:ND1,ND2,DDK) = Au(0:ND1,ND2,DDK) &
-!                                 +    tau3(i,0:ND1,Edge_Num,DDK,level) &
-!                                 * BITF1(i,Edge_Num,DDK)
-!
-!            enddo
-!            Au(0:ND1,ND2,DDK) = Au(0:ND1,ND2,DDK) &
-!                              +    tau2(0:ND1,Edge_Num,DDK,level) &
-!                              * BITF1(0:ND1,Edge_Num,DDK)
-!!     add interface penalty : second set of dirichlet
-!            Au(0:ND1,ND2,DDK) =    Au(0:ND1,ND2,DDK) &
-!                              + Sigma_tild(0:ND1,Edge_Num,DDK,level) &
-!                              *    BITF1(0:ND1,Edge_Num,DDK)
-!!     add interface penalty : neumann
-!            Au(0:ND1,ND2,DDK) =  Au(0:ND1,ND2,DDK) &
-!                              + SigmaHat(0:ND1,Edge_Num,DDK,level) &
-!                              *  BITF2(0:ND1,Edge_Num,DDK)
          end select
 
          do j=0,ND2

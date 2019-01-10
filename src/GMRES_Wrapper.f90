@@ -1,20 +1,19 @@
-      subroutine GMRES_WRAPPER(phi,res,n,tol)
+      subroutine GMRES_WRAPPER(phi,res,n,tol,l)
       use Legendre
       use MD2D_Grid
       use GMRES
       implicit none
 
       integer:: n, outer, Nx, Ny
-      real(kind=8):: phi(0:PolyDegN_DM(1,1,1),0:PolyDegN_DM(2,1,1),1:TotNum_DM)
-      real(kind=8):: res(0:PolyDegN_DM(1,1,1),0:PolyDegN_DM(2,1,1),1:TotNum_DM)
-      real(kind=8):: tmp(0:PolyDegN_DM(1,1,1),0:PolyDegN_DM(2,1,1),1:TotNum_DM)
+      integer:: i, j, k, s, iconv, iter, l, m
+      real(kind=8):: phi(0:PolyDegN_DM(1,1,l),0:PolyDegN_DM(2,1,l),1:TotNum_DM)
+      real(kind=8):: res(0:PolyDegN_DM(1,1,l),0:PolyDegN_DM(2,1,l),1:TotNum_DM)
+      real(kind=8):: tmp(0:PolyDegN_DM(1,1,l),0:PolyDegN_DM(2,1,l),1:TotNum_DM)
       real(kind=8):: tol,alpha,temp, rnorm, tolps, tolpss, ll
       real(kind=8):: glsc2
-      integer:: i, j, k, s, iconv, iter, l, m
 
       tmp = 0.d0
 
-      l = 1
       iter  = 0
       m     = lgmres ! FIXEME: You can define the size of m (Krylov subspce dimension)
 
@@ -23,7 +22,7 @@
 
       iconv = 0
 
-      Nx=PolyDegN_DM(1,1,1); Ny=PolyDegN_DM(2,1,1)
+      Nx=PolyDegN_DM(1,1,l); Ny=PolyDegN_DM(2,1,l)
 
       call chk_amax('res',res,Nx,Ny,l)
 
@@ -61,13 +60,13 @@
          endif
 
 !     Compute initial residual norm
-         gamma(1) = sqrt(glsc2(Nx,Ny,gmres_rr,gmres_rr,l)) ! gamma  = sqrt{ (r,r) }
-         write(10,*)'gamma',gamma(1)
+         gmres_gamma(1) = sqrt(glsc2(Nx,Ny,gmres_rr,gmres_rr,l)) ! gamma  = sqrt{ (r,r) }
+         write(10,*)'gmres_gamma',gmres_gamma(1)
 
 !     Check for lucky convergence
          rnorm = 0.
-         if(gamma(1) .eq. 0.) goto 9000
-         temp = 1./gamma(1)
+         if(gmres_gamma(1) .eq. 0.) goto 9000
+         temp = 1./gmres_gamma(1)
 
          call chk_amax('it3',gmres_rr,Nx,Ny,l)
 
@@ -76,7 +75,7 @@
          do DDK = 1, TotNum_DM
             ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
             gmres_vv(0:ND1,0:ND2,DDK,1) = gmres_rr(0:ND1,0:ND2,DDK) &
-                                   / (gamma(1))
+                                   / (gmres_gamma(1))
          enddo
 
          call chk_amax('it4',gmres_rr,Nx,Ny,l)
@@ -135,11 +134,11 @@
             gmres_c(j) = gmres_h(j,j) * temp
             gmres_s(j) = alpha  * temp
             gmres_h(j,j) = ll
-            gamma(j+1) = -gmres_s(j) * gamma(j)
-            gamma(j)   =  gmres_c(j) * gamma(j)
+            gmres_gamma(j+1) = -gmres_s(j) * gmres_gamma(j)
+            gmres_gamma(j)   =  gmres_c(j) * gmres_gamma(j)
 
 
-            rnorm = abs(gamma(j+1))!*norm_fac
+            rnorm = abs(gmres_gamma(j+1))!*norm_fac
             write (10,66) iter,tolpss,rnorm
 66    format(i5,1p2e12.5,' gmres_mg')
 
@@ -165,7 +164,7 @@
 !        write(6,*) 'start solving least squre problem'
 
          do k=j,1,-1
-            temp = gamma(k)
+            temp = gmres_gamma(k)
             do i=j,k+1,-1
                temp = temp - gmres_h(k,i)*gmres_c(i)
             enddo

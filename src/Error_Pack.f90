@@ -7,7 +7,8 @@
       implicit none
       
       integer :: i,j,k,error_loc,gridmax,grid
-      integer ::mgl
+      integer :: mgl
+      real(kind=8) :: U_CG(0:PolyDegN_DM(1,1,mgl),0:PolyDegN_DM(2,1,mgl),1:TotNum_DM) 
       !  real(kind=8) :: error_iter(1:count)
       
       gridmax=0.0
@@ -76,7 +77,7 @@
       !close(74)
       !close(90)
       
-      write(10,fmt="(A10,es24.15)")'Max error:',error_max
+      write(10,fmt="(A10,es24.15)")' Max error:',error_max
       write(93,1001) gridmax,error_max
       close(93)
       
@@ -107,6 +108,6 @@
 1000 format(9e23.15)      
 1001 format(I3,es24.15)
 !1002 format(I5,A2,e24.15)
-1003 format(A6,1x,I0.3,1x,A6,es24.15)
+1003 format(' ',A6,1x,I0.3,1x,A6,es24.15)
      return
      end subroutine Error_Computing

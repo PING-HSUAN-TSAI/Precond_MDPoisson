@@ -171,7 +171,7 @@
 
       amx = glamax(A,LD1,LD2,level)
 
-      write(*,*)"check2:",s3,amx
+      write(10,*)"check2:",s3,amx
 
       return
 

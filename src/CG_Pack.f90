@@ -49,22 +49,14 @@
 !     initial residue and p
       call add3s2(r,f,Ax,1.0,-1.0,Nx,Ny,l)
       call copy(p,r,Nx,Ny,l)
-!      do DDK=1,TotNum_DM
-!         ND1=PolyDegN_DM(1,DDK,l)
-!         ND2=PolyDegN_DM(2,DDK,l)
-!         do j=0,ND2
-!            do i=0,ND1
-!               write(*,*)i,j,p(i,j,DDK),r(i,j,DDK)
-!            enddo
-!         enddo
-!      enddo
+
       call chk_amax('inr',r,Nx,Ny,l)
       call chk_amax('inp',p,Nx,Ny,l)
 
       rsold = glsc2(Nx,Ny,r,r,l)
       
 !     start iteration
-      do k=1,3* iterNum
+      do k=1,3*iterNum
 
          call axhelm2(Nx,Ny,p,Ap,l)
 
@@ -78,7 +70,7 @@
 
          if (abs(rsnew) .lt. tol) then
       
-!            write(*,*)'rsnew has reached the condition'
+            write(10,fmt="(i5,A36,es24.15)")k," iterations to reach the tolerance: ", tol
             exit
          endif
       
@@ -95,7 +87,7 @@
 9999 format(' ',' ', 'CG   : iteration#',i5,1p3e12.4)
          return
       end subroutine CG
-      !!======================================================================
+!======================================================================
       subroutine axhelm2(LD1,LD2,u,Au,l)
       use MD2D_Grid    ! MD2D_Grid.f90
       use State_Var    ! State_Var.f90
@@ -135,7 +127,7 @@
       vEdge=0.0d0; dvdnEdge=0.0d0; BvEdge=0.0d0
       BITF1=0.0d0; BITF2=0.0d0
 
-write(*,*)'u',maxval(u)
+      write(*,*)'u',maxval(u)
       
       do DDK=1,TotNum_DM
          ND1=PolyDegN_DM(1,DDK,l)
@@ -145,7 +137,7 @@ write(*,*)'u',maxval(u)
       do j=0,ND2
       do i=0,ND1
       write(*,*)i,j,u(i,j,DDK)
-      !write(181,fmt="(2I3,1x,1E11.5e3)")i,j,u(i,j,DDK)
+!      !write(181,fmt="(2I3,1x,1E11.5e3)")i,j,u(i,j,DDK)
       enddo
       enddo
       !close(181)

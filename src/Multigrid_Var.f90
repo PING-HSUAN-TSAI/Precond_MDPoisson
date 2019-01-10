@@ -1,107 +1,110 @@
       module Multigrid_Var
+
       implicit none
       
 !     Allocate variables for ML operator
-      real(kind=8), save, allocatable::  I_U(:,:,:,:)
-      real(kind=8), save, allocatable::  ML(:,:,:,:)
+      real(kind=8), save, allocatable :: I_U(:,:,:,:)
+      real(kind=8), save, allocatable :: ML(:,:,:,:)
       
 !     Smoothing variables
-      real(kind=8), save, allocatable::  r_smooth(:,:,:)
-      real(kind=8), save, allocatable::  rc_smooth(:,:,:)
-      real(kind=8), save, allocatable::  b_smooth(:,:,:)
-      real(kind=8), save, allocatable::  x_vc(:,:,:)
-      real(kind=8), save, allocatable::  Ax_vc(:,:,:)
-      real(kind=8), save, allocatable::  M(:) ! for Jacobi smoothing
-      real(kind=8), save, allocatable::  Mr(:,:,:)
+      real(kind=8), save, allocatable :: r_smooth(:,:,:)
+      real(kind=8), save, allocatable :: rc_smooth(:,:,:)
+      real(kind=8), save, allocatable :: b_smooth(:,:,:)
+      real(kind=8), save, allocatable :: x_vc(:,:,:)
+      real(kind=8), save, allocatable :: Ax_vc(:,:,:)
+      real(kind=8), save, allocatable :: M(:) ! for Jacobi smoothing
+      real(kind=8), save, allocatable :: Mr(:,:,:)
       
 !     Interpolate matrix
-      real(kind=8), save, allocatable::  xo(:,:), yo(:,:)
-      real(kind=8), save, allocatable::  xi(:,:), yi(:,:)
-      real(kind=8), save, allocatable:: Ihx(:,:,:)
-      real(kind=8), save, allocatable:: Ihy(:,:,:)
-      real(kind=8), save, allocatable:: Ihx_transpose(:,:,:)
-      real(kind=8), save, allocatable:: Ihy_transpose(:,:,:)
-      real(kind=8), save, allocatable::  wx(:,:,:)
-      real(kind=8), save, allocatable::  wy(:,:,:)
+      real(kind=8), save, allocatable :: xo(:,:), yo(:,:)
+      real(kind=8), save, allocatable :: xi(:,:), yi(:,:)
+      real(kind=8), save, allocatable :: Ihx(:,:,:)
+      real(kind=8), save, allocatable :: Ihy(:,:,:)
+      real(kind=8), save, allocatable :: Ihx_transpose(:,:,:)
+      real(kind=8), save, allocatable :: Ihy_transpose(:,:,:)
+      real(kind=8), save, allocatable :: wx(:,:,:)
+      real(kind=8), save, allocatable :: wy(:,:,:)
       
-      real(kind=8), save, allocatable::  test(:,:,:)
+      real(kind=8), save, allocatable :: test(:,:,:)
       
       !-coarse correction variables
-      real(kind=8), save, allocatable::  xc_in(:,:,:)
-      real(kind=8), save, allocatable::  ec(:,:,:)
-      real(kind=8), save, allocatable::  ef(:,:,:)
+      real(kind=8), save, allocatable :: xc_in(:,:,:)
+      real(kind=8), save, allocatable :: ec(:,:,:)
+      real(kind=8), save, allocatable :: ef(:,:,:)
       
       !-Lx, Ly operator
-      real(kind=8), save, allocatable::  Lx(:,:,:)
-      real(kind=8), save, allocatable::  Ly(:,:,:)
-      real(kind=8), save, allocatable::  Bx(:,:,:)
-      real(kind=8), save, allocatable::  By(:,:,:)
-      real(kind=8), save, allocatable::  dudx_tmp(:,:,:)
-      real(kind=8), save, allocatable::  dudy_tmp(:,:,:)
-      real(kind=8), save, allocatable::  lamx(:,:)
-      real(kind=8), save, allocatable::  lamy(:,:)
-      real(kind=8), save, allocatable::  Lxx(:,:,:)
-      real(kind=8), save, allocatable::  Lyy(:,:,:)
-      real(kind=8), save, allocatable::  Bxx(:,:,:)
-      real(kind=8), save, allocatable::  Byy(:,:,:)
-      real(kind=8), save, allocatable::  lamxx(:,:)
-      real(kind=8), save, allocatable::  lamyy(:,:)
-      real(kind=8), save, allocatable::   bwxx(:,:)
-      real(kind=8), save, allocatable::   bwyy(:,:)
-      real(kind=8), save, allocatable::  Sxx_t(:,:,:)
-      real(kind=8), save, allocatable::  Sxx(:,:,:)
-      real(kind=8), save, allocatable::  Syy_t(:,:,:)
-      real(kind=8), save, allocatable::  Syy(:,:,:)
+      real(kind=8), save, allocatable :: Lx(:,:,:)
+      real(kind=8), save, allocatable :: Ly(:,:,:)
+      real(kind=8), save, allocatable :: Bx(:,:,:)
+      real(kind=8), save, allocatable :: By(:,:,:)
+      real(kind=8), save, allocatable :: dudx_tmp(:,:,:)
+      real(kind=8), save, allocatable :: dudy_tmp(:,:,:)
+      real(kind=8), save, allocatable :: lamx(:,:)
+      real(kind=8), save, allocatable :: lamy(:,:)
+      real(kind=8), save, allocatable :: Lxx(:,:,:,:)
+      real(kind=8), save, allocatable :: Lyy(:,:,:,:)
+      real(kind=8), save, allocatable :: Bxx(:,:,:,:)
+      real(kind=8), save, allocatable :: Byy(:,:,:,:)
+      real(kind=8), save, allocatable :: lamxx(:,:,:)
+      real(kind=8), save, allocatable :: lamyy(:,:,:)
+      real(kind=8), save, allocatable :: bwxx(:,:,:)
+      real(kind=8), save, allocatable :: bwyy(:,:,:)
+      real(kind=8), save, allocatable :: Sxx_t(:,:,:,:)
+      real(kind=8), save, allocatable :: Sxx(:,:,:,:)
+      real(kind=8), save, allocatable :: Syy_t(:,:,:,:)
+      real(kind=8), save, allocatable :: Syy(:,:,:,:)
       
-      real(kind=8), save, allocatable::     z_ov(:,:,:)
-      real(kind=8), save, allocatable:: z_ov_sol(:,:,:)
-      real(kind=8), save, allocatable::   bwx(:,:)
-      real(kind=8), save, allocatable::   bwy(:,:)
-      real(kind=8), save, allocatable::   Diagonal(:,:)
-      real(kind=8), save, allocatable::   DDiagonal(:,:)
-      real(kind=8), save, allocatable::  Sx_t(:,:,:)
-      real(kind=8), save, allocatable::  Sx(:,:,:)
-      real(kind=8), save, allocatable::  Sy_t(:,:,:)
-      real(kind=8), save, allocatable::  Sy(:,:,:)
-      real(kind=8), save, allocatable::  Sx_t_norm(:,:,:)
-      real(kind=8), save, allocatable::  Sx_norm(:,:,:)
-      real(kind=8), save, allocatable::  Sy_t_norm(:,:,:)
-      real(kind=8), save, allocatable::  Sy_norm(:,:,:)
-      real(kind=8), save, allocatable::  BSx(:,:,:)
-      real(kind=8), save, allocatable::  BSy(:,:,:)
-      real(kind=8), save, allocatable::  SxBSx(:,:,:)
-      real(kind=8), save, allocatable::  SyBSy(:,:,:)
-      real(kind=8), save, allocatable::  scale_c(:,:)
+      real(kind=8), save, allocatable :: z_ov(:,:,:)
+      real(kind=8), save, allocatable :: z_ov_sol(:,:,:)
+      real(kind=8), save, allocatable :: bwx(:,:)
+      real(kind=8), save, allocatable :: bwy(:,:)
+      real(kind=8), save, allocatable :: Diagonal(:,:)
+      real(kind=8), save, allocatable :: DDiagonal(:,:,:)
+      real(kind=8), save, allocatable :: Sx_t(:,:,:)
+      real(kind=8), save, allocatable :: Sx(:,:,:)
+      real(kind=8), save, allocatable :: Sy_t(:,:,:)
+      real(kind=8), save, allocatable :: Sy(:,:,:)
+      real(kind=8), save, allocatable :: Sx_t_norm(:,:,:)
+      real(kind=8), save, allocatable :: Sx_norm(:,:,:)
+      real(kind=8), save, allocatable :: Sy_t_norm(:,:,:)
+      real(kind=8), save, allocatable :: Sy_norm(:,:,:)
+      real(kind=8), save, allocatable :: BSx(:,:,:)
+      real(kind=8), save, allocatable :: BSy(:,:,:)
+      real(kind=8), save, allocatable :: SxBSx(:,:,:)
+      real(kind=8), save, allocatable :: SyBSy(:,:,:)
+      real(kind=8), save, allocatable :: scale_c(:,:)
       
       !-Wrapper variables
-      real(kind=8), save, allocatable::  b_wrapper(:,:,:)
-      real(kind=8), save, allocatable::  x_precond(:,:,:)
-      real(kind=8), save, allocatable::  Ax_precond(:,:,:)
-      real(kind=8), save, allocatable::  r_wrapper(:,:,:)
-      real(kind=8), save, allocatable::  r_tmp(:,:,:)
-      real(kind=8), save, allocatable:: pc_proAp(:)
+      real(kind=8), save, allocatable :: b_wrapper(:,:,:)
+      real(kind=8), save, allocatable :: x_precond(:,:,:)
+      real(kind=8), save, allocatable :: Ax_precond(:,:,:)
+      real(kind=8), save, allocatable :: r_wrapper(:,:,:)
+      real(kind=8), save, allocatable :: r_tmp(:,:,:)
+      real(kind=8), save, allocatable :: pc_proAp(:)
+      real(kind=8), save, allocatable :: Proj_AP(:,:,:,:)
+      real(kind=8), save, allocatable :: Proj_P(:,:,:,:)
+      real(kind=8), save, allocatable :: p_cond(:,:,:)
+      real(kind=8), save, allocatable :: w(:,:,:)
+      real(kind=8), save, allocatable :: Pap_pcond(:,:,:)
       real(kind=8):: pAp_wrapper
       real(kind=8):: pp
       real(kind=8):: alpha_wrapper
       integer :: Nk
-      real(kind=8), save, allocatable::  Proj_AP(:,:,:,:)
-      real(kind=8), save, allocatable::  Proj_P(:,:,:,:)
-      real(kind=8), save, allocatable::  p_cond(:,:,:)
-      real(kind=8), save, allocatable::  w(:,:,:)
-      real(kind=8), save, allocatable::  Pap_pcond(:,:,:)
 
 
       !mghs
+      real(kind=8), save, allocatable :: mg_jh(:,:,:)
+      real(kind=8), save, allocatable :: mg_jhfc(:,:,:)
+      real(kind=8), save, allocatable :: mg_jht(:,:,:)
+      real(kind=8), save, allocatable :: mg_jhfct(:,:,:)
+      real(kind=8), save, allocatable :: mg_zh(:,:)
       integer :: mg_lmax, mg_nx(1:3), mg_ny(1:3), mg_nz(1:3)
       integer :: mg_nh(1:3)
-      real(kind=8), save, allocatable:: mg_jh(:,:,:)
-      real(kind=8), save, allocatable:: mg_jhfc(:,:,:)
-      real(kind=8), save, allocatable:: mg_jht(:,:,:)
-      real(kind=8), save, allocatable:: mg_jhfct(:,:,:)
-      real(kind=8), save, allocatable:: mg_zh(:,:)
+
       contains
-!======================================================================      
+!----------------------------------------------------------------------      
       subroutine alloc_mem_wrapper_var(DegMax,DegNcMax,TotNumDomain,step)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -122,15 +125,16 @@
                           w(0:ND1,0:ND2,1:TotNumDomain), &
                   Pap_pcond(0:ND1,0:ND2,1:TotNumDomain), &
                    pc_proAp(1:step), &
-                        ef(0:ND1,0:ND2,1:TotNumDomain), &
-                      x_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                     Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                      z_ov(0:ND1,0:ND2,1:TotNumDomain), &
-                     z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
+                         ef(0:ND1,0:ND2,1:TotNumDomain), &
+                       x_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                      Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                       z_ov(0:ND1,0:ND2,1:TotNumDomain), &
+                    z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
                      stat = ierr)
+
       allocate(   xc_in(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
-                        ec(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
-                     rc_smooth(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
+                     ec(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
+              rc_smooth(0:DegNcMax,0:DegNcMax,1:TotNumDomain), &
                      stat = ierr)
 
       if (ierr .ne. 0 ) then
@@ -153,8 +157,9 @@
       
       end subroutine alloc_mem_wrapper_var
       
-      !=============================================================================
+!----------------------------------------------------------------------      
       subroutine alloc_mem_MLoperator_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -179,6 +184,7 @@
 
       end subroutine 
       subroutine alloc_mem_jacobismooth_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -216,7 +222,9 @@
 
 
       end subroutine
+!----------------------------------------------------------------------      
       subroutine alloc_mem_Interpolatematrix_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -226,22 +234,23 @@
 
       ND1 = DegMax(1); ND2 = DegMax(2);
       ND1p = ND1 + 1; ND2p = ND2 + 1;
-      allocate(Ihx(0:ND1,0:ND1,1:TotNumDomain), &
-                       Ihy(0:ND2,0:ND2,1:TotNumDomain), &
-             Ihx_transpose(0:ND1,0:ND1,1:TotNumDomain), &
-             Ihy_transpose(0:ND2,0:ND2,1:TotNumDomain), &
-                  mg_jh(0:ND2,0:ND2,1:3), &
-               mg_jht(0:ND1,0:ND1,1:3), &
-               mg_jhfc(0:ND2,0:ND2,1:3), &
-               mg_jhfct(0:ND2,0:ND2,1:3), &
-               mg_zh(0:ND1,1:3), &
-                        xo(0:ND1,1:TotNumDomain), &
-                        xi(0:ND1,1:TotNumDomain), &
-                        yo(0:ND2,1:TotNumDomain), &
-                        yi(0:ND2,1:TotNumDomain), &
-                        wx(0:ND1,1:2,1:TotNumDomain), &
-                        wy(0:ND2,1:2,1:TotNumDomain), &
-               stat=ierr)
+
+      allocate( Ihx(0:ND1,0:ND1,1:TotNumDomain), &
+                Ihy(0:ND2,0:ND2,1:TotNumDomain), &
+                Ihx_transpose(0:ND1,0:ND1,1:TotNumDomain), &
+                Ihy_transpose(0:ND2,0:ND2,1:TotNumDomain), &
+                mg_jh(0:ND2,0:ND2,1:3), &
+                mg_jht(0:ND1,0:ND1,1:3), &
+                mg_jhfc(0:ND2,0:ND2,1:3), &
+                mg_jhfct(0:ND2,0:ND2,1:3), &
+                mg_zh(0:ND1,1:3), &
+                xo(0:ND1,1:TotNumDomain), &
+                xi(0:ND1,1:TotNumDomain), &
+                yo(0:ND2,1:TotNumDomain), &
+                yi(0:ND2,1:TotNumDomain), &
+                wx(0:ND1,1:2,1:TotNumDomain), &
+                wy(0:ND2,1:2,1:TotNumDomain), &
+                stat=ierr)
 
       if (ierr .ne. 0 ) then
          write(*,*)'Cannot allocate memory for Interpolate matrix &
@@ -260,7 +269,9 @@
       mg_jhfc=0.d0; mg_jhfct=0.d0
       mg_zh=0.d0
       end subroutine
+!----------------------------------------------------------------------      
       subroutine alloc_mem_ovlapsmooth_var(DegMax,TotNumDomain)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
@@ -271,15 +282,15 @@
       ND1 = DegMax(1); ND2 = DegMax(2);
       ND1p = ND1 + 1; ND2p = ND2 + 1;
       allocate(  r_smooth(0:ND1,0:ND2,1:TotNumDomain), &
-                  rc_smooth(0:ND1,0:ND2,1:TotNumDomain), &
-                  b_smooth(0:ND1,0:ND2,1:TotNumDomain), &
-                     xc_in(0:ND1,0:ND2,1:TotNumDomain), &
-                        ec(0:ND1,0:ND2,1:TotNumDomain), &
-                        ef(0:ND1,0:ND2,1:TotNumDomain), &
-                      x_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                     Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
-                      z_ov(0:ND1,0:ND2,1:TotNumDomain), &
-                     z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
+                rc_smooth(0:ND1,0:ND2,1:TotNumDomain), &
+                 b_smooth(0:ND1,0:ND2,1:TotNumDomain), &
+                    xc_in(0:ND1,0:ND2,1:TotNumDomain), &
+                       ec(0:ND1,0:ND2,1:TotNumDomain), &
+                       ef(0:ND1,0:ND2,1:TotNumDomain), &
+                     x_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                    Ax_vc(0:ND1,0:ND2,1:TotNumDomain), &
+                     z_ov(0:ND1,0:ND2,1:TotNumDomain), &
+                 z_ov_sol(0:ND1,0:ND2,1:TotNumDomain), &
                stat=ierr)
 
       if (ierr .ne. 0 ) then
@@ -297,45 +308,47 @@
 
 
       end subroutine
-      subroutine alloc_mem_Lx_Ly_var(DegMax,TotNumDomain)
+!----------------------------------------------------------------------      
+      subroutine alloc_mem_Lx_Ly_var(DegMax,TotNumDomain,mg_len)
+
       implicit none
       integer:: DegMax(2)
       integer:: TotNumDomain
       integer:: ND1, ND2
       integer:: ND1p, ND2p
-      integer:: ierr,step
+      integer:: ierr,step,mg_len
 
       ND1 = DegMax(1); ND2 = DegMax(2);
       ND1p = ND1 + 1; ND2p = ND2 + 1;
       allocate(   Lx(0:ND1,0:ND1,1:TotNumDomain), &
                   Ly(0:ND2,0:ND2,1:TotNumDomain), &
-                  Lxx(0:ND1,0:ND1,1:TotNumDomain), &
-                  Lyy(0:ND2,0:ND2,1:TotNumDomain), &
+                  Lxx(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Lyy(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
                   Bx(0:ND1,0:ND1,1:TotNumDomain), &
                   By(0:ND2,0:ND2,1:TotNumDomain), &
-                  Bxx(0:ND1,0:ND1,1:TotNumDomain), &
-                  Byy(0:ND2,0:ND2,1:TotNumDomain), &
+                  Bxx(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Byy(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
                   dudx_tmp(0:ND1,0:ND1,1:TotNumDomain), &
                   dudy_tmp(0:ND2,0:ND2,1:TotNumDomain), &
                   lamx(0:ND1,1:TotNumDomain), &
                   lamy(0:ND2,1:TotNumDomain), &
-                  lamxx(0:ND1,1:TotNumDomain), &
-                  lamyy(0:ND2,1:TotNumDomain), &
+                  lamxx(0:ND1,1:TotNumDomain,mg_len), &
+                  lamyy(0:ND2,1:TotNumDomain,mg_len), &
                   bwx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
                   bwy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
-                  bwxx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
-                  bwyy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
+                  bwxx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
+                  bwyy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
                   Diagonal(1:(ND1+1)*(ND2+1),1:TotNumDomain), &
-                  DDiagonal(1:(ND1+1)*(ND2+1),1:TotNumDomain), &
+                  DDiagonal(1:(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
                   scale_c(1:(ND1+1)*(ND2+1),1:TotNumDomain), &
                   Sx_t(0:ND1,0:ND1,1:TotNumDomain), &
                   Sy_t(0:ND2,0:ND2,1:TotNumDomain), &
                   Sx(0:ND1,0:ND1,1:TotNumDomain), &
                   Sy(0:ND2,0:ND2,1:TotNumDomain), &
-                  Sxx_t(0:ND1,0:ND1,1:TotNumDomain), &
-                  Syy_t(0:ND2,0:ND2,1:TotNumDomain), &
-                  Sxx(0:ND1,0:ND1,1:TotNumDomain), &
-                  Syy(0:ND2,0:ND2,1:TotNumDomain), &
+                  Sxx_t(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Syy_t(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
+                  Sxx(0:ND1,0:ND1,1:TotNumDomain,mg_len), &
+                  Syy(0:ND2,0:ND2,1:TotNumDomain,mg_len), &
                   Sx_t_norm(0:ND1,0:ND1,1:TotNumDomain), &
                   Sy_t_norm(0:ND2,0:ND2,1:TotNumDomain), &
                   Sx_norm(0:ND1,0:ND1,1:TotNumDomain), &
@@ -345,6 +358,7 @@
                   SxBSx(0:ND1,0:ND1,1:TotNumDomain), &
                   SyBSy(0:ND2,0:ND2,1:TotNumDomain), &
                   stat=ierr)
+
       if (ierr .ne. 0 ) then
          write(*,*)'Cannot allocate memory for Lx and Ly variables'
          write(*,*)'Abort!'
@@ -376,7 +390,9 @@
 
       scale_c = 1.d0
       end subroutine
+!----------------------------------------------------------------------      
       subroutine Initial_I_U(DegDM,TotNumDomain)
+
       implicit none
       integer:: DegDM(2,TotNumDomain)
       integer:: TotNumDomain

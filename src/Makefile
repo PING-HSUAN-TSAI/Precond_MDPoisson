@@ -78,6 +78,7 @@ OBJS = $(FBIN)/Poisson2D.o\
     $(FBIN)/GMRES.o\
     $(FBIN)/INPUT.o\
     $(FBIN)/connect.o\
+    $(FBIN)/dump.o
 #    $(FBIN)/pspm_mg.o
 
 
@@ -220,6 +221,9 @@ $(FBIN)/OutPut_Tec.o:\
 
 $(FBIN)/connect.o:\
 	$(DIR)/input.$(MOD_SFX)
+
+$(FBIN)/dump.o:\
+	$(DIR)/md2d_grid.$(MOD_SFX)
 
 #$(FBIN)/pspm_mg.o:\
 #	$(DIR)/md2d_grid.$(MOD_SFX)\

@@ -483,18 +483,20 @@
       enddo ! DDK
       
       end subroutine
-      !===============================================================
+!---------------------------------------------------------------
       subroutine Smoothing_Pack(LD1,LD2,l)
+
       use constants
       use Legendre
       use MD2D_Grid
       use State_Var
       use CG_Var
       use Multigrid_Var
+
       implicit none
-      integer :: N_vcycle, m_smooth, LD1, LD2
-      integer :: vcycle, iterNumc, method, ind_JS
-      integer :: k, i, j, n, ND1p, ND2p,l, ND1c, ND2c, Nx, Ny
+      integer      :: N_vcycle, m_smooth, LD1, LD2
+      integer      :: vcycle, iterNumc, method, ind_JS
+      integer      :: k, i, j, n, ND1p, ND2p,l, ND1c, ND2c, Nx, Ny
       real(kind=8) :: smoothpar
       real(kind=8) :: x_vc_ini(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: error_vc(0:LD1,0:LD2,1:TotNum_DM)
@@ -503,16 +505,17 @@
       real(kind=8) :: tmp4(0:LD1,0:LD2,1:TotNum_DM),tmp5(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp6(0:LD1,0:LD2,1:TotNum_DM)
 
+      write(10,*)'l in smoothing_Pack',l
+
       Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
 
       call alloc_mem_jacobismooth_var(PolyDegN_DM(1,1,l),TotNum_DM)
 
-      N_vcycle = 1
-      m_smooth = 1
+      N_vcycle  = 1
+      m_smooth  = 5
       smoothpar = 2.d0/3.d0
 
-      
-!================================================================================
+!--------------------------------------------------------------------------------
 !     Construct Jacobi-smoothing matrix
 !      open(347,file='M.text')
       
@@ -547,7 +550,9 @@
          call chk_amax('xvc',x_vc,Nx,Ny,l)
          call chk_amax('bJr',r_smooth,Nx,Ny,l)
 
-!     Jacobi smoothing
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),l,'bJr')
+
+!        Jacobi smoothing
          do k = 1,m_smooth
 
             do DDK = 1, TotNum_DM
@@ -562,14 +567,17 @@
                x_vc(0:ND1,0:ND2,DDK) = x_vc(0:ND1,0:ND2,DDK) &
                                      + smoothpar * Mr(0:ND1,0:ND2,DDK)
             enddo !DDK
-         call chk_amax('xas',x_vc,Nx,Ny,l)
+            call chk_amax('xas',x_vc,Nx,Ny,l)
 
             call axhelm2(Nx,Ny,x_vc,Ax_vc,l)
             call add3s2(r_smooth,b_smooth,Ax_vc,1.0,-1.0,Nx,Ny,l)
 
+            call chk_amax('aJr',r_smooth,Nx,Ny,l)
          enddo ! smooth
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),l,'aJr')
+
       
-!     Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
+!        Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
       
          do DDK = 1 ,TotNum_DM
             ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
@@ -590,9 +598,12 @@
             iterNumc = iterNumc + (PolyDegN_DM(1,DDK,l-1)+1) &
                                    * (PolyDegN_DM(2,DDK,l-1)+1)
          enddo
+
          call chk_amax('xci',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)   
+
          call CG(ec(0:ND1c,0:ND2c,1:TotNum_DM),xc_in(0:ND1c,0:ND2c,1:TotNum_DM),&
-         rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),1,iterNumc,1e-20)
+         rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),l-1,iterNumc,1e-20)
+
          call chk_amax('ecg',ec,ND1c,ND2c,l-1)
          call chk_amax('rcc',rc_smooth,ND1c,ND2c,l-1)
       
@@ -609,21 +620,17 @@
       
          call add2s2(x_vc,ef,1.0,Nx,Ny,l)
 
+         call outpost(x_vc(0:ND1,0:ND2,1:TotNum_DM),l,'xvc')
+
+!        v is exact solution
          call add3s2(error_vc,v,x_vc,1.0,-1.0,Nx,Ny,l)
      
          call chk_amax('ers',error_vc,Nx,Ny,l)
+         call outpost(error_vc(0:ND1,0:ND2,1:TotNum_DM),l,'evc')
          call copy(x_vc_ini,x_vc,Nx,Ny,l)
 
-!         do DDK =1, TotNum_DM
-!         do j=0,Ny
-!         do i=0,Nx
-!         write(*,*)'x_vc',i,j,DDK,x_vc(i,j,DDK)
-!         enddo
-!         enddo
-!         enddo
-      
-         enddo ! vcycle
-         write(10,*)'End cycle'
+      enddo ! vcycle
+      write(10,*)'End cycle'
       
       end subroutine Smoothing_Pack
       !===============================================================================
@@ -646,10 +653,10 @@
       real(kind=8) :: tmp4(0:LD1,0:LD2,1:TotNum_DM),tmp5(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp6(0:LD1,0:LD2,1:TotNum_DM)
 
-      Nx = PolyDegN_DM(1,1,1); Ny = PolyDegN_DM(2,1,1)
+      Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
 
-      N_vcycle = 6
-      m_smooth = 15
+      N_vcycle = 1
+      m_smooth = 1
       smoothpar = 1.0 !2.d0/3.d0
       
 
@@ -715,8 +722,8 @@
 !     Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
       
          do DDK = 1 ,TotNum_DM
-            ND1 = PolyDegN_DM(1,DDK,1); ND2 = PolyDegN_DM(2,DDK,1)
-            ND1c = PolyDegN_DM(1,DDK,2); ND2c = PolyDegN_DM(2,DDK,2)
+            ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
+            ND1c = PolyDegN_DM(1,DDK,l-1); ND2c = PolyDegN_DM(2,DDK,l-1)
       
             tmp(0:ND1,0:ND2c,DDK) = &
                Matmul(r_smooth(0:ND1,0:ND2,DDK), Ihy(0:ND2,0:ND2c,DDK))
@@ -728,19 +735,19 @@
       
          iterNumc = 0; iterNum = 0
          do DDK=1,TotNum_DM
-            iterNumc = iterNumc + (PolyDegN_DM(1,DDK,2)+1) &
-                                * (PolyDegN_DM(2,DDK,2)+1)
-            iterNum = iterNum + (PolyDegN_DM(1,DDK,1)+1) &
-                              * (PolyDegN_DM(2,DDK,1)+1)
+            iterNumc = iterNumc + (PolyDegN_DM(1,DDK,l-1)+1) &
+                                * (PolyDegN_DM(2,DDK,l-1)+1)
+            iterNum = iterNum + (PolyDegN_DM(1,DDK,l)+1) &
+                              * (PolyDegN_DM(2,DDK,l)+1)
          enddo
       
       
 !     Calling CG to solve for ec
-         call CG(ec,xc_in,rc_smooth,2,iterNumc,1e-16)
+         call CG(ec,xc_in,rc_smooth,l-1,iterNumc,1e-20)
       
          do DDK = 1 ,TotNum_DM
-            ND1 = PolyDegN_DM(1,DDK,1); ND2 = PolyDegN_DM(2,DDK,1)
-            ND1c = PolyDegN_DM(1,DDK,2); ND2c = PolyDegN_DM(2,DDK,2)
+            ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
+            ND1c = PolyDegN_DM(1,DDK,l-1); ND2c = PolyDegN_DM(2,DDK,l-1)
       
 !     Interpolate ec to ef which is from coarse to fine
       !--------------------------------------------------------------------------
@@ -926,22 +933,22 @@
       !
       
       end subroutine
-      !================================================================================
-      !-This subroutine is to construct the Lx and Ly operators which are in one
-      ! dimensional. This idea is from the paper "Hybrid Multigrid/Schwarz
-      ! Algorithms for the Spectral Element Method
+!--------------------------------------------------------------------------------
       subroutine Construct_Lx_Ly_operator(level)
+!     This subroutine is to construct the Lx and Ly operators which are in one
+!     dimensional. This idea is from the paper "Hybrid Multigrid/Schwarz
+!     Algorithms for the Spectral Element Method
       use Multigrid_Var
       use State_Var
       use constants
       use Legendre
       use MD2D_Grid
+
       implicit none
       integer:: ND1p, ND2p, index, lbw, info
       integer:: i, j, level
       
 !     Initialize variables for Lx and Ly operator
-!      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM)
       
       do DDK=1,TotNum_DM
          ND1=PolyDegN_DM(1,DDK,level); ND2=PolyDegN_DM(2,DDK,level)
@@ -976,132 +983,122 @@
          Ly(0:ND2,0:ND2,DDK) = - Matmul(Diff_xi1(0:ND1,0:ND1,ND1), &
                                            dudy_tmp(0:ND2,0:ND2,DDK) )
       enddo
-
-      write(10,*)'L operator without penalty'
-      do DDK=1,TotNum_DM
-         ND1=PolyDegN_DM(1,DDK,level); ND2=PolyDegN_DM(2,DDK,level)
-         do j=0,ND2
-            do i=0,ND1
-               write(10,*)i,j,DDK,Lx(i,j,DDK),Ly(i,j,DDK)
-            enddo
-         enddo
-      enddo
       
+      call dumpopt(Lx,level,'Lwo')
+
 !     Start adding penalty for every DDK
       do DDK=1,TotNum_DM
          ND1=PolyDegN_DM(1,DDK,level); ND2=PolyDegN_DM(2,DDK,level)
          ND1p = ND1 + 1; ND2p = ND2 + 1
-!     side 4
+
+!        side 4
          Edge_Num=4
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Lx(0:ND1,0,DDK) = Lx(0:ND1,0,DDK) &
                                + (tauD(0:ND1,0,Edge_Num,DDK,level)   &
                                -  tau_tilde(0:ND1,1,Edge_Num,DDK,level))
             case(2,3)
                do j = 0,ND2
                   Lx(0:ND1,j,DDK) = Lx(0:ND1,j,DDK) &
-                                  +    tauND1(0:ND1,j,Edge_Num,DDK,level) !&
+                                  + tauND1(0:ND1,j,Edge_Num,DDK,level) !&
                enddo
             case(0)
                write(10,*)'Edge:',Edge_Num,'interface penalty'
 !     add interface penalty : first set of dirichlet
                Lx(0:ND1,0,DDK) = Lx(0:ND1,0,DDK) &
                                + tau1(0:ND1,0,Edge_Num,DDK,level) 
-               Lx(0,0,DDK) = Lx(0,0,DDK) &
-                           +  tau2(1,Edge_Num,DDK,level) !&
+               Lx(0    ,0,DDK) = Lx(0,0,DDK) &
+                               + tau2(1,Edge_Num,DDK,level) !&
 !     add interface penalty : second set of dirichlet
-               Lx(0,0,DDK) = Lx(0,0,DDK) &
-                           + Sigma_tild(1,Edge_Num,DDK,level)  !&
+               Lx(0    ,0,DDK) = Lx(0,0,DDK) &
+                               + Sigma_tild(1,Edge_Num,DDK,level)  !&
 !     add interface penalty : neumann
                Lx(0,0:ND2,DDK) = Lx(0,0:ND2,DDK) &
                                - SigmaHat(0,Edge_Num,DDK,level) *2&
                                * Diff_xi1(0,0:ND1,ND1)
          end select
-!     side 2
+
+!        side 2
          Edge_Num=2
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Lx(0:ND1,ND2,DDK) = Lx(0:ND1,ND2,DDK) &
                                  +(    tauD(0:ND1,ND2,Edge_Num,DDK,level) &
                                  - tau_tilde(0:ND1,ND2-1,Edge_Num,DDK,level))
             case(2,3)
                do j=0,ND2
                   Lx(0:ND1,j,DDK) = Lx(0:ND1,j,DDK) &
-                                  +    tauND1(0:ND1,j,Edge_Num,DDK,level) !&
+                                  + tauND1(0:ND1,j,Edge_Num,DDK,level) !&
                enddo
             case(0)
-               write(10,*)'Edge:',Edge_Num,'interface penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tau1(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
-               do i=0,ND1
-                  write(10,*)i,Sigma_tild(i,Edge_Num,DDK,level),tau2(i,Edge_Num,DDK,level),SigmaHat(i,Edge_Num,DDK,level)
-               enddo
+!               write(10,*)'Edge:',Edge_Num,'interface penalty'
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tau1(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
+!               do i=0,ND1
+!                  write(10,*)i,Sigma_tild(i,Edge_Num,DDK,level),tau2(i,Edge_Num,DDK,level),SigmaHat(i,Edge_Num,DDK,level)
+!               enddo
 !     add interface penalty : first set of dirichlet
                Lx(0:ND1,ND1,DDK) = Lx(0:ND1,ND1,DDK) &
                                  + tau1(0:ND1,ND1,Edge_Num,DDK,level) !
-               Lx(ND1,ND1,DDK) = Lx(ND1,ND1,DDK) &
-                               +     tau2(ND1-1,Edge_Num,DDK,level)  !&
+               Lx(ND1  ,ND1,DDK) = Lx(ND1,ND1,DDK) &
+                                 + tau2(ND1-1,Edge_Num,DDK,level)  !&
 !     add interface penalty : second set of dirichlet
-               Lx(ND1,ND1,DDK) = Lx(ND1,ND1,DDK) &
-                                  + Sigma_tild(ND1-1,Edge_Num,DDK,level)  !&
+               Lx(ND1  ,ND1,DDK) = Lx(ND1,ND1,DDK) &
+                                 + Sigma_tild(ND1-1,Edge_Num,DDK,level)  !&
 !     add interface penalty : neumann
                Lx(ND1,0:ND2,DDK) = Lx(ND1,0:ND2,DDK) &
-                                    + SigmaHat(ND2,Edge_Num,DDK,level) *2 &
-                                    * Diff_xi1(ND1,0:ND1,ND1)
-            do i=0,ND1
-               write(10,*)SigmaHat(ND2,Edge_Num,DDK,level) * Diff_xi1(ND1,i,ND1)
-            enddo
+                                 + SigmaHat(ND2,Edge_Num,DDK,level) *2 &
+                                 * Diff_xi1(ND1,0:ND1,ND1)
+!            do i=0,ND1
+!               write(10,*)SigmaHat(ND2,Edge_Num,DDK,level) * Diff_xi1(ND1,i,ND1)
+!            enddo
          end select
 
-            write(10,*)'Lx operator after adding penalty'
-            do j=0,ND1
-               do i =0,ND1
-                  write(10,*)i,j,Lx(i,j,DDK)
-               enddo
-            enddo
-!     side 1
+         call dumpopt(Lx,level,'Lxw')
+
+!        side 1
          Edge_Num=1
          select case (BC_Type(Edge_Num,DDK))
             case(1)
                write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Ly(0:ND1,0,DDK) = Ly(0:ND1,0,DDK) &
                                + (    tauD(0,0:ND2,Edge_Num,DDK,level) &
                                - tau_tilde(1,0:ND2,Edge_Num,DDK,level))
             case(2,3)
                do i=0,ND1
                   Ly(i,0:ND2,DDK) = Ly(i,0:ND2,DDK) &
-                                  +    tauND1(i,0:ND2,Edge_Num,DDK,level) !&
+                                  + tauND1(i,0:ND2,Edge_Num,DDK,level) !&
                enddo
             case(0)
 !     Add interface penalty : first set of dirichlet
                Ly(0:ND1,0,DDK) = Ly(0:ND1,0,DDK) &
                                + tau1(0,0:ND2,Edge_Num,DDK,level) 
-               Ly(0,0,DDK) = Ly(0,0,DDK) &
-                           + tau2(1,Edge_Num,DDK,level) !&
+               Ly(0    ,0,DDK) = Ly(0,0,DDK) &
+                               + tau2(1,Edge_Num,DDK,level) !&
 !     Add interface penalty : second set of dirichlet
-               Ly(0,0,DDK) = Ly(0,0,DDK) &
-                           + Sigma_tild(1,Edge_Num,DDK,level)  !&
+               Ly(0    ,0,DDK) = Ly(0,0,DDK) &
+                               + Sigma_tild(1,Edge_Num,DDK,level)  !&
 !     Add interface penalty : neumann
                Ly(0,0:ND2,DDK) = Ly(0,0:ND2,DDK) &
                                - SigmaHat(0,Edge_Num,DDK,level) *2 &
@@ -1112,11 +1109,11 @@
          select case (BC_Type(Edge_Num,DDK))
             case(1)
                write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Ly(0:ND1,ND2,DDK) = Ly(0:ND1,ND2,DDK) &
                                  + (    tauD(ND1,0:ND2,Edge_Num,DDK,level)  &
                                  - tau_tilde(ND1-1,0:ND2,Edge_Num,DDK,level))  !&
@@ -1345,81 +1342,3 @@
       
       
       end subroutine
-      
-      !===================================================================
-      !-----------------------------------------------------------------------
-      
-      !subroutine generalev(a,b,lam,nn,w)
-      !  use MD2D_Grid
-      !  implicit none
-      !!
-      !
-      !!     Solve the generalized eigenvalue problem  A x = lam B x
-      !
-      !!
-      !
-      !!     A -- symm.
-      !
-      !!     B -- symm., pos. definite
-      !
-      !!
-      !
-      !!     "SIZE" is included here only to deduce WDSIZE, the working
-      !
-      !!     precision, in bytes, so as to know whether dsygv or ssygv
-      !
-      !!     should be called.
-      !
-      !!
-      !
-      !!include 'SIZE'
-      !
-      !!include 'PARALLEL'
-      !
-      !!
-      !integer :: nn
-      !real(kind=8):: a(0:nn,0:nn,1),b(0:nn,0:nn,1),lam(0:nn,1),w(0:nn,0:nn,1)
-      !integer :: lx1, ly1, lz1, lelv, ierr, info, i, j
-      !!real aa(100),bb(100)
-      !integer :: lbw
-      !real(kind=8), allocatable :: bw(:)
-      !lx1 = nn +1
-      !ly1 = nn +1
-      !lz1 = 1
-      !lelv = 1
-      !lbw = 4*lx1*ly1*lz1*lelv
-      !write(*,*)'lx1=',lx1
-      !write(*,*)'ly1=',ly1
-      !write(*,*)'lbw=',lbw
-      !allocate ( bw(lbw), stat = ierr)
-      !
-      !
-      !!
-      !
-      !!lw = n*n
-      !
-      !do DDK = 1, TotNum_DM
-      !ND1 = PolyDegN_DM(1,DDK,1)
-      !do j=0,ND1
-      !do i =0,ND1
-      !write(*,*)i,j,a(i,j,DDK),b(i,j,DDK)
-      !enddo
-      !enddo
-      !enddo
-      !
-      !
-      !!if (ifdblas) then
-      !write(*,*)'nn=',nn
-      !call dsygv(1,'V','U',nn+1,a,nn+1,b,nn+1,lam,bw,lbw,info)
-      !write(*,*)'info', info
-      !write(*,*)'after_nn=',nn
-      !write(*,*)lam(0:ND1,1)
-      !!else
-      !!
-      !!call ssygv(1,'V','U',n,a,n,b,n,lam,bw,lbw,info)
-      !!
-      !!endif
-      !
-      !
-      !return
-      !end subroutine
