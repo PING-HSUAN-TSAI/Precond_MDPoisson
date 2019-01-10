@@ -943,12 +943,12 @@
       use constants
       use Legendre
       use MD2D_Grid
+
       implicit none
       integer:: ND1p, ND2p, index, lbw, info
       integer:: i, j, level
       
 !     Initialize variables for Lx and Ly operator
-!      call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM)
       
       do DDK=1,TotNum_DM
          ND1=PolyDegN_DM(1,DDK,level); ND2=PolyDegN_DM(2,DDK,level)
@@ -986,21 +986,12 @@
       
       call dumpopt(Lx,level,'Lwo')
 
-!      write(10,*)'L operator without penalty'
-!      do DDK=1,TotNum_DM
-!         ND1=PolyDegN_DM(1,DDK,level); ND2=PolyDegN_DM(2,DDK,level)
-!         do j=0,ND2
-!            do i=0,ND1
-!               write(10,*)i,j,DDK,Lx(i,j,DDK),Ly(i,j,DDK)
-!            enddo
-!         enddo
-!      enddo
-      
 !     Start adding penalty for every DDK
       do DDK=1,TotNum_DM
          ND1=PolyDegN_DM(1,DDK,level); ND2=PolyDegN_DM(2,DDK,level)
          ND1p = ND1 + 1; ND2p = ND2 + 1
-!     side 4
+
+!        side 4
          Edge_Num=4
          select case (BC_Type(Edge_Num,DDK))
             case(1)
@@ -1016,24 +1007,25 @@
             case(2,3)
                do j = 0,ND2
                   Lx(0:ND1,j,DDK) = Lx(0:ND1,j,DDK) &
-                                  +    tauND1(0:ND1,j,Edge_Num,DDK,level) !&
+                                  + tauND1(0:ND1,j,Edge_Num,DDK,level) !&
                enddo
             case(0)
                write(10,*)'Edge:',Edge_Num,'interface penalty'
 !     add interface penalty : first set of dirichlet
                Lx(0:ND1,0,DDK) = Lx(0:ND1,0,DDK) &
                                + tau1(0:ND1,0,Edge_Num,DDK,level) 
-               Lx(0,0,DDK) = Lx(0,0,DDK) &
-                           +  tau2(1,Edge_Num,DDK,level) !&
+               Lx(0    ,0,DDK) = Lx(0,0,DDK) &
+                               + tau2(1,Edge_Num,DDK,level) !&
 !     add interface penalty : second set of dirichlet
-               Lx(0,0,DDK) = Lx(0,0,DDK) &
-                           + Sigma_tild(1,Edge_Num,DDK,level)  !&
+               Lx(0    ,0,DDK) = Lx(0,0,DDK) &
+                               + Sigma_tild(1,Edge_Num,DDK,level)  !&
 !     add interface penalty : neumann
                Lx(0,0:ND2,DDK) = Lx(0,0:ND2,DDK) &
                                - SigmaHat(0,Edge_Num,DDK,level) *2&
                                * Diff_xi1(0,0:ND1,ND1)
          end select
-!     side 2
+
+!        side 2
          Edge_Num=2
          select case (BC_Type(Edge_Num,DDK))
             case(1)
@@ -1049,7 +1041,7 @@
             case(2,3)
                do j=0,ND2
                   Lx(0:ND1,j,DDK) = Lx(0:ND1,j,DDK) &
-                                  +    tauND1(0:ND1,j,Edge_Num,DDK,level) !&
+                                  + tauND1(0:ND1,j,Edge_Num,DDK,level) !&
                enddo
             case(0)
 !               write(10,*)'Edge:',Edge_Num,'interface penalty'
@@ -1064,27 +1056,23 @@
 !     add interface penalty : first set of dirichlet
                Lx(0:ND1,ND1,DDK) = Lx(0:ND1,ND1,DDK) &
                                  + tau1(0:ND1,ND1,Edge_Num,DDK,level) !
-               Lx(ND1,ND1,DDK) = Lx(ND1,ND1,DDK) &
-                               +     tau2(ND1-1,Edge_Num,DDK,level)  !&
+               Lx(ND1  ,ND1,DDK) = Lx(ND1,ND1,DDK) &
+                                 + tau2(ND1-1,Edge_Num,DDK,level)  !&
 !     add interface penalty : second set of dirichlet
-               Lx(ND1,ND1,DDK) = Lx(ND1,ND1,DDK) &
-                                  + Sigma_tild(ND1-1,Edge_Num,DDK,level)  !&
+               Lx(ND1  ,ND1,DDK) = Lx(ND1,ND1,DDK) &
+                                 + Sigma_tild(ND1-1,Edge_Num,DDK,level)  !&
 !     add interface penalty : neumann
                Lx(ND1,0:ND2,DDK) = Lx(ND1,0:ND2,DDK) &
-                                    + SigmaHat(ND2,Edge_Num,DDK,level) *2 &
-                                    * Diff_xi1(ND1,0:ND1,ND1)
+                                 + SigmaHat(ND2,Edge_Num,DDK,level) *2 &
+                                 * Diff_xi1(ND1,0:ND1,ND1)
 !            do i=0,ND1
 !               write(10,*)SigmaHat(ND2,Edge_Num,DDK,level) * Diff_xi1(ND1,i,ND1)
 !            enddo
          end select
 
-            write(10,*)'Lx operator after adding penalty'
-!            do j=0,ND1
-!               do i =0,ND1
-!                  write(10,*)i,j,Lx(i,j,DDK)
-!               enddo
-!            enddo
-!     side 1
+         call dumpopt(Lx,level,'Lxw')
+
+!        side 1
          Edge_Num=1
          select case (BC_Type(Edge_Num,DDK))
             case(1)
@@ -1100,17 +1088,17 @@
             case(2,3)
                do i=0,ND1
                   Ly(i,0:ND2,DDK) = Ly(i,0:ND2,DDK) &
-                                  +    tauND1(i,0:ND2,Edge_Num,DDK,level) !&
+                                  + tauND1(i,0:ND2,Edge_Num,DDK,level) !&
                enddo
             case(0)
 !     Add interface penalty : first set of dirichlet
                Ly(0:ND1,0,DDK) = Ly(0:ND1,0,DDK) &
                                + tau1(0,0:ND2,Edge_Num,DDK,level) 
-               Ly(0,0,DDK) = Ly(0,0,DDK) &
-                           + tau2(1,Edge_Num,DDK,level) !&
+               Ly(0    ,0,DDK) = Ly(0,0,DDK) &
+                               + tau2(1,Edge_Num,DDK,level) !&
 !     Add interface penalty : second set of dirichlet
-               Ly(0,0,DDK) = Ly(0,0,DDK) &
-                           + Sigma_tild(1,Edge_Num,DDK,level)  !&
+               Ly(0    ,0,DDK) = Ly(0,0,DDK) &
+                               + Sigma_tild(1,Edge_Num,DDK,level)  !&
 !     Add interface penalty : neumann
                Ly(0,0:ND2,DDK) = Ly(0,0:ND2,DDK) &
                                - SigmaHat(0,Edge_Num,DDK,level) *2 &
