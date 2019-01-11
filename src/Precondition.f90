@@ -633,7 +633,7 @@
       write(10,*)'End cycle'
       
       end subroutine Smoothing_Pack
-      !===============================================================================
+!-------------------------------------------------------------------------------
       subroutine Smoothing_Pack_Overlapping(LD1,LD2,l)
       use Legendre
       use MD2D_Grid
@@ -717,7 +717,7 @@
 
          enddo ! smooth
       
-            !-compute the error of x_vc in smoothing part and exact solution
+!     Compute the error of x_vc in smoothing part and exact solution
       
 !     Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
       
@@ -743,20 +743,20 @@
       
       
 !     Calling CG to solve for ec
-         call CG(ec,xc_in,rc_smooth,l-1,iterNumc,1e-20)
+         call CG(ec,xc_in,rc_smooth,l-1,iterNumc,1e-16)
       
          do DDK = 1 ,TotNum_DM
             ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
             ND1c = PolyDegN_DM(1,DDK,l-1); ND2c = PolyDegN_DM(2,DDK,l-1)
       
 !     Interpolate ec to ef which is from coarse to fine
-      !--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
             tmp1(0:ND1c,0:ND2,DDK) = &
                Matmul(ec(0:ND1c,0:ND2c,DDK),Ihy_transpose(0:ND2c,0:ND2,DDK))
       
             ef(0:ND1,0:ND2,DDK) = &
                Matmul(Ihx(0:ND1,0:ND1c,DDK),tmp1(0:ND1c,0:ND2,DDK))
-      !---------------------------------------------------------------------------
+!---------------------------------------------------------------------------
          enddo
          call add2s2(x_vc,ef,1.0,Nx,Ny,l)
 
@@ -766,126 +766,125 @@
          call copy(x_vc_ini,x_vc,Nx,Ny,l)
       
          enddo ! vcycle
-          write(10,*)'End cycle'
+         write(10,*)'End cycle'
       
-      endsubroutine Smoothing_Pack_Overlapping
-    
-      !---------------------------------------------------------------------------
+      end subroutine Smoothing_Pack_Overlapping
+!---------------------------------------------------------------------------
       subroutine fd_weights_full(xx,x,n,mm,c)
-        use Multigrid_Var
-        implicit none
-      !
-      !     This routine evaluates the derivative based on all points
-      !     in the stencils.  It is more memory efficient than "fd_weights"
-      !
-      !     This set of routines comes from the appendix of
-      !     A Practical Guide to Pseudospectral Methods, B. Fornberg
-      !     Cambridge Univ. Press, 1996.   (pff)
-      !
-      !     Input parameters:
-      !       xx -- point at wich the approximations are to be accurate
-      !       x  -- array of x-ordinates:   x(0:n)
-      !       n  -- polynomial degree of interpolant (# of points := n+1)
-      !       m  -- highest order of derivative to be approxxmated at xi
-      !
-      !     Output:
-      !       c  -- set of coefficients c(0:n,0:m).
-      !             c(j,k) is to be applied at x(j) when
-      !             the kth derivative is approxxmated by a
-      !             stencil extending over x(0),x(1),...x(n).
-      !
-      !
-        integer:: n, mm, i, j, k, mn
-        real(kind=8):: xx
-        real(kind=8):: x(0:n)
-        real(kind=8):: c(0:n,0:mm)
-        real(kind=8):: c1, c2, c3, c4, c5
-      !
-        c1       = 1.
-        c4       = x(0) - xx
-      !
-        do k=0,mm
-          do j=0,n
+      use Multigrid_Var
+      implicit none
+!
+!     This routine evaluates the derivative based on all points
+!     in the stencils.  It is more memory efficient than "fd_weights"
+!
+!     This set of routines comes from the appendix of
+!     A Practical Guide to Pseudospectral Methods, B. Fornberg
+!     Cambridge Univ. Press, 1996.   (pff)
+!
+!     Input parameters:
+!       xx -- point at wich the approximations are to be accurate
+!       x  -- array of x-ordinates:   x(0:n)
+!       n  -- polynomial degree of interpolant (# of points := n+1)
+!       m  -- highest order of derivative to be approxxmated at xi
+!
+!     Output:
+!       c  -- set of coefficients c(0:n,0:m).
+!             c(j,k) is to be applied at x(j) when
+!             the kth derivative is approxxmated by a
+!             stencil extending over x(0),x(1),...x(n).
+!
+!
+      integer:: n, mm, i, j, k, mn
+      real(kind=8):: xx
+      real(kind=8):: x(0:n)
+      real(kind=8):: c(0:n,0:mm)
+      real(kind=8):: c1, c2, c3, c4, c5
+
+      c1       = 1.
+      c4       = x(0) - xx
+
+      do k=0,mm
+         do j=0,n
             c(j,k) = 0.
-          enddo
-        enddo
-        c(0,0) = 1.
-      !
-        do i=1,n
-          mn = min(i,mm)
-          c2 = 1.
-          c5 = c4
-          c4 = x(i)-xx
-          do j=0,i-1
+         enddo
+      enddo
+      c(0,0) = 1.
+
+      do i=1,n
+         mn = min(i,mm)
+         c2 = 1.
+         c5 = c4
+         c4 = x(i)-xx
+         do j=0,i-1
             c3 = x(i)-x(j)
             c2 = c2*c3
-              do k=mn,1,-1
-              c(i,k) = c1*(k*c(i-1,k-1)-c5*c(i-1,k))/c2
-              enddo
-              c(i,0) = -c1*c5*c(i-1,0)/c2
-                do k=mn,1,-1
-                  c(j,k) = (c4*c(j,k)-k*c(j,k-1))/c3
-                enddo
-                c(j,0) = c4*c(j,0)/c3
-          enddo
-          c1 = c2
-        enddo
+            do k=mn,1,-1
+               c(i,k) = c1*(k*c(i-1,k-1)-c5*c(i-1,k))/c2
+            enddo
+            c(i,0) = -c1*c5*c(i-1,0)/c2
+            do k=mn,1,-1
+               c(j,k) = (c4*c(j,k)-k*c(j,k-1))/c3
+            enddo
+            c(j,0) = c4*c(j,0)/c3
+         enddo
+         c1 = c2
+      enddo
       
-        return
+      return
       end subroutine
-      !!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       subroutine Interp_mat(l)
-        use Legendre
-        use MD2D_Grid
-        use Multigrid_Var
-        implicit none
+      use Legendre
+      use MD2D_Grid
+      use Multigrid_Var
+
+      implicit none
       
-        integer:: l, i, j, ND1c, ND2c 
+      integer:: l, i, j, ND1c, ND2c 
       
-        do DDK = 1, TotNum_DM
-          ND1 = PolyDegN_DM(1,DDK,l)
-          ND2 = PolyDegN_DM(2,DDK,l)
-          xo(0:ND1,DDK) = LGLCoord(0:ND1,ND1)
-          yo(0:ND2,DDK) = LGLCoord(0:ND2,ND2)
-        enddo
-      
-        
-        do DDK = 1, TotNum_DM
-          ND1 = PolyDegN_DM(1,DDK,l-1)
-          ND2 = PolyDegN_DM(2,DDK,l-1)
-          xi(0:ND1,DDK) = LGLCoord(0:ND1,ND1)
-          yi(0:ND2,DDK) = LGLCoord(0:ND2,ND2)
-        enddo
+      do DDK = 1, TotNum_DM
+         ND1 = PolyDegN_DM(1,DDK,l)
+         ND2 = PolyDegN_DM(2,DDK,l)
+         xo(0:ND1,DDK) = LGLCoord(0:ND1,ND1)
+         yo(0:ND2,DDK) = LGLCoord(0:ND2,ND2)
+      enddo
       
       
-        do DDK = 1, TotNum_DM
-          ND1 = PolyDegN_DM(1,DDK,l)
-          ND1c = PolyDegN_DM(1,DDK,l-1)
-          ND2 = PolyDegN_DM(2,DDK,l)
-          ND2c = PolyDegN_DM(2,DDK,l-1)
+      do DDK = 1, TotNum_DM
+         ND1 = PolyDegN_DM(1,DDK,l-1)
+         ND2 = PolyDegN_DM(2,DDK,l-1)
+         xi(0:ND1,DDK) = LGLCoord(0:ND1,ND1)
+         yi(0:ND2,DDK) = LGLCoord(0:ND2,ND2)
+      enddo
       
-      !-Constructing the interpolation matrix J
-          do i = 0, ND1
-          call fd_weights_full(xo(i,DDK),xi(:,DDK),ND1c,1,wx(0:ND1c,1:2,DDK))
-          Ihx(0:ND1c,i,DDK) = wx(0:ND1c,1,DDK)
       
-          enddo
+      do DDK = 1, TotNum_DM
+         ND1 = PolyDegN_DM(1,DDK,l)
+         ND1c = PolyDegN_DM(1,DDK,l-1)
+         ND2 = PolyDegN_DM(2,DDK,l)
+         ND2c = PolyDegN_DM(2,DDK,l-1)
       
-      !-Storing the interpolation matrix J and J'
-          Ihx_transpose(:,:,DDK) = Ihx(:,:,DDK)
-          Ihx(:,:,DDK) = transpose(Ihx(:,:,DDK))
+!     Constructing the interpolation matrix J
+         do i = 0, ND1
+            call fd_weights_full(xo(i,DDK),xi(:,DDK),ND1c,1,wx(0:ND1c,1:2,DDK))
+            Ihx(0:ND1c,i,DDK) = wx(0:ND1c,1,DDK)
+         enddo
       
-      !-Constructing the interpolation matrix J
-          do j = 0, ND2
-          call fd_weights_full(yo(j,DDK),yi(:,DDK),ND2c,1,wy(0:ND2c,1:2,DDK))
-          Ihy(0:ND2c,j,DDK) = wy(0:ND2c,1,DDK)
-          enddo
+!     Storing the interpolation matrix J and J'
+         Ihx_transpose(:,:,DDK) = Ihx(:,:,DDK)
+         Ihx(:,:,DDK) = transpose(Ihx(:,:,DDK))
       
-      !-Storing the interpolation matrix J and J'
-          Ihy_transpose(:,:,DDK) = Ihy(:,:,DDK)
-          Ihy(:,:,DDK) = transpose(Ihy(:,:,DDK))
+!     Constructing the interpolation matrix J
+         do j = 0, ND2
+            call fd_weights_full(yo(j,DDK),yi(:,DDK),ND2c,1,wy(0:ND2c,1:2,DDK))
+            Ihy(0:ND2c,j,DDK) = wy(0:ND2c,1,DDK)
+         enddo
       
-        enddo ! DDK
+!     Storing the interpolation matrix J and J'
+         Ihy_transpose(:,:,DDK) = Ihy(:,:,DDK)
+         Ihy(:,:,DDK) = transpose(Ihy(:,:,DDK))
+      
+      enddo ! DDK
      
 !        open(319,file='Jhx.text')
 !        do DDK = 1, TotNum_DM
