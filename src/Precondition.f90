@@ -934,7 +934,7 @@
       
       end subroutine
 !--------------------------------------------------------------------------------
-      subroutine Construct_Lx_Ly_operator(level)
+      subroutine Construct_Lx_Ly_operator(LD1,LD2,level)
 !     This subroutine is to construct the Lx and Ly operators which are in one
 !     dimensional. This idea is from the paper "Hybrid Multigrid/Schwarz
 !     Algorithms for the Spectral Element Method
@@ -945,8 +945,12 @@
       use MD2D_Grid
 
       implicit none
-      integer:: ND1p, ND2p, index, lbw, info
-      integer:: i, j, level
+      integer :: ND1p,ND2p,index,lbw,info
+      integer :: i,j,level
+      integer :: LD1,LD2
+      real(kind=8) :: tmp(0:LD1,0:LD2,1:TotNum_DM),tmp1(0:LD1,0:LD2,1:TotNum_DM)
+      real(kind=8) :: tmp2(0:LD1,0:LD2,1:TotNum_DM),tmp3(0:LD1,0:LD2,1:TotNum_DM)
+      real(kind=8) :: tmp4(0:LD1,0:LD2,1:TotNum_DM),tmp5(0:LD1,0:LD2,1:TotNum_DM)
       
 !     Initialize variables for Lx and Ly operator
       
@@ -1251,7 +1255,11 @@
 !     Start Diagonalize Ly operator
       do DDK = 1, TotNum_DM
          ND2 = PolyDegN_DM(2,DDK,level)
-         lbw = 4 * (ND2+1) * (ND2+1)
+         lbw = -1
+         call dsygv(1,'V','U',ND2+1,Ly(0:ND2,0:ND2,DDK),&
+               ND2+1,By(0:ND2,0:ND2,DDK),ND2+1,lamy(0:ND2,DDK),bwy,lbw,info)
+         lbw = int(bwy(1))
+!         lbw = 4 * (ND2+1) * (ND2+1)
          call dsygv(1,'V','U',ND2+1,Ly(0:ND2,0:ND2,DDK),&
                ND2+1,By(0:ND2,0:ND2,DDK),ND2+1,lamy(0:ND2,DDK),bwy,lbw,info)
          write(10,*)'checking info',info
@@ -1288,23 +1296,8 @@
 
       call dumpevec(Sx,level,'Sxo')
       call dumpevec(Sx_norm,level,'Sxw')
-
-!      write(*,*)'Output the normalizd eigenvectors of L_x and L_y'
-!      do DDK = 1, TotNum_DM
-!         ND1 = PolyDegN_DM(1,DDK,level)
-!         do j=0,ND1
-!            do i =0,ND1
-!               write(10,*)i,j,Sx_norm(i,j,DDK),Sy_norm(i,j,DDK)&
-!               ,Sx(i,j,DDK),Sy(i,j,DDK),Lx(i,j,DDK)
-!            enddo
-!         enddo
-!      enddo
-!      do DDK = 1, TotNum_DM
-!         ND1 = PolyDegN_DM(1,DDK,level)
-!         do j=0,ND1
-!            write(10,*)j,sqrt(SxBSx(j,j,DDK)),sqrt(SyBSy(j,j,DDK))
-!         enddo
-!      enddo
+      call dumpevec(Sy,level,'Syo')
+      call dumpevec(Sy_norm,level,'Syw')
 
       open(unit=50,file='Diagonal.text')
       do DDK = 1, TotNum_DM
@@ -1320,38 +1313,35 @@
       enddo
       close(50)
 
-      !!-Checking......
-      !open(1054,file='Compare.text')
-      !do DDK = 1, TotNum_DM
-      !ND1 = PolyDegN_DM(1,DDK,level)
-      !ND2 = PolyDegN_DM(2,DDK,level)
-      !
-      !tmp2(0:ND1,0:ND2,DDK) = &
-      !Matmul(F(0:ND1,0:ND2,DDK), Sy(0:ND2,0:ND2,DDK))
-      !
-      !tmp3(0:ND1,0:ND2,DDK) = &
-      !Matmul(Sx_t(0:ND1,0:ND1,DDK), tmp2(0:ND1,0:ND2,DDK))
-      !
-      !do j=0,ND2
-      !do i=0,ND1
-      !index = i + j*(ND2+1) +1
-      !tmp4(i,j,DDK) = Diagonal(index,DDK) * tmp3(i,j,DDK)
-      !enddo
-      !enddo
-      !tmp5(0:ND1,0:ND2,DDK) = &
-      !Matmul(tmp4(0:ND1,0:ND2,DDK), Sy_t(0:ND2,0:ND2,DDK))
-      !
-      !test(0:ND1,0:ND2,DDK) = &
-      !Matmul(Sx(0:ND1,0:ND1,DDK), tmp5(0:ND1,0:ND2,DDK))
-      !
-      !do j=0,ND2
-      !do i=0,ND1
-      !write(1054,*)i,j,test(i,j,DDK),v(i,j,DDK),test(i,j,DDK)-v(i,j,DDK)
-      !enddo
-      !enddo
-      !enddo
+!     Checking......
+      open(1054,file='Compare.text')
+      do DDK = 1, TotNum_DM
+         ND1 = PolyDegN_DM(1,DDK,level)
+         ND2 = PolyDegN_DM(2,DDK,level)
+         
+         tmp2(0:ND1,0:ND2,DDK) = &
+         Matmul(rhs(0:ND1,0:ND2,DDK), Sy(0:ND2,0:ND2,DDK))
+         
+         tmp3(0:ND1,0:ND2,DDK) = &
+         Matmul(Sx_t(0:ND1,0:ND1,DDK), tmp2(0:ND1,0:ND2,DDK))
+         
+         do j=0,ND2
+            do i=0,ND1
+               index = i + j*(ND2+1) +1
+               tmp4(i,j,DDK) = Diagonal(index,DDK) * tmp3(i,j,DDK)
+            enddo
+         enddo
+         tmp5(0:ND1,0:ND2,DDK) = &
+         Matmul(tmp4(0:ND1,0:ND2,DDK), Sy_t(0:ND2,0:ND2,DDK))
       
+         tmp(0:ND1,0:ND2,DDK) = &
+         Matmul(Sx(0:ND1,0:ND1,DDK), tmp5(0:ND1,0:ND2,DDK))
       
-      
+         do j=0,ND2
+            do i=0,ND1
+               write(1054,*)i,j,tmp(i,j,DDK),v(i,j,DDK),tmp(i,j,DDK)-v(i,j,DDK)
+            enddo
+         enddo
+      enddo
       
       end subroutine
