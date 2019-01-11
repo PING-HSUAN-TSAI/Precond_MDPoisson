@@ -185,6 +185,7 @@
 
 
       end subroutine 
+!----------------------------------------------------------------------      
       subroutine alloc_mem_jacobismooth_var(DegMax,TotNumDomain)
 
       implicit none
