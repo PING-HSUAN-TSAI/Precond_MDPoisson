@@ -1,8 +1,8 @@
-!===============================================================!
+!---------------------------------------------------------------!
 !                                                               !
 ! This is a module defining variables for 2D Poisson equation   !
 !                                                               !
-!===============================================================!
+!---------------------------------------------------------------!
 module State_Var  ! Variables for Poisson equation
 implicit none
 
@@ -91,7 +91,7 @@ real(kind=8), save, allocatable::  Sigmatil_2(:,:,:)
 !
 !                v_{tt} = a div dot ( b grad v ) 
 !
-!================================================================================
+!--------------------------------------------------------------------------------
 !
 !    [Name]    :: v(:,:,:)
 !     ^^^^
@@ -112,7 +112,7 @@ real(kind=8), save, allocatable::  Sigmatil_2(:,:,:)
 !    [Detail]  :: Value of the time derivative of variable v
 !     ^^^^^^
 !
-!================================================================================
+!--------------------------------------------------------------------------------
 
 contains
 
@@ -192,7 +192,7 @@ subroutine Init_State_Variables(DegMax,TotNumDomain,mgl)
     
 end subroutine Init_State_Variables
 
-!=================================================================
+!-----------------------------------------------------------------
 subroutine alloc_mem_BC_Var(N_max,Num_Domain,mgl)
   use MD2D_Grid
   implicit none
@@ -281,6 +281,6 @@ Sigma=0.0; SigmaSurr=0.0; SigmaSurr2=0.0; SigmaHat=0.0; Sigma_tild=0.0;
   return
 
 end subroutine alloc_mem_BC_Var
-!=================================================================
+!-----------------------------------------------------------------
  
 end module State_Var
