@@ -634,7 +634,8 @@
       
       end subroutine Smoothing_Pack
 !-------------------------------------------------------------------------------
-      subroutine Smoothing_Pack_Overlapping(LD1,LD2,l)
+      subroutine Smoothing_Pack_Overlapping(LD1,LD2,LD1c,LD2c,l)
+
       use Legendre
       use MD2D_Grid
       use State_Var
@@ -642,9 +643,13 @@
       use Multigrid_Var
 
       implicit none
-      integer :: N_vcycle, m_smooth, LD1, LD2
+
+      integer :: N_vcycle, m_smooth
+      integer :: LD1,LD2,LD1c,LD2c
       integer :: vcycle, iterNumc, method, ind_JS, iterNum
       integer :: k, i, j, index, ND1p, ND2p,l, ND1c, ND2c, Nx, Ny
+      integer :: nn
+
       real(kind=8) :: smoothpar
       real(kind=8) :: x_vc_ini(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: error_vc(0:LD1,0:LD2,1:TotNum_DM)
@@ -652,6 +657,16 @@
       real(kind=8) :: tmp2(0:LD1,0:LD2,1:TotNum_DM),tmp3(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp4(0:LD1,0:LD2,1:TotNum_DM),tmp5(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp6(0:LD1,0:LD2,1:TotNum_DM)
+
+      ! coarse grid variable
+      real(kind=8) :: rcc_smooth(0:LD1c,0:LD2c,1:TotNum_DM),xcc_in(0:LD1c,0:LD2c,1:TotNum_DM)
+      real(kind=8) :: ecc(0:LD1c,0:LD2c,1:TotNum_DM)
+
+      nn = (LD1c+1)*(LD2c+1)*TotNum_DM
+
+      call rzero(rcc_smooth,nn)
+      call rzero(xcc_in,nn)
+      call rzero(ecc,nn)
 
       Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
 
@@ -675,6 +690,8 @@
 
          call chk_amax('xvc',x_vc,Nx,Ny,l)
          call chk_amax('bJr',r_smooth,Nx,Ny,l)
+
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),l,'bJr')
       
 !     Additive Jacobi Schwartz
          do k = 1,m_smooth
@@ -716,6 +733,7 @@
             call add3s2(r_smooth,b_smooth,Ax_vc,1.0,-1.0,Nx,Ny,l)
 
          enddo ! smooth
+         call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),l,'aJr')
       
 !     Compute the error of x_vc in smoothing part and exact solution
       
@@ -732,18 +750,15 @@
                Matmul(Ihx_transpose(0:ND1c,0:ND1,DDK),tmp(0:ND1,0:ND2c,DDK))
 
          enddo
-      
-         iterNumc = 0; iterNum = 0
+
+         iterNumc = 0
          do DDK=1,TotNum_DM
             iterNumc = iterNumc + (PolyDegN_DM(1,DDK,l-1)+1) &
                                 * (PolyDegN_DM(2,DDK,l-1)+1)
-            iterNum = iterNum + (PolyDegN_DM(1,DDK,l)+1) &
-                              * (PolyDegN_DM(2,DDK,l)+1)
          enddo
       
-      
-!     Calling CG to solve for ec
-!         call CG(ec,xc_in,rc_smooth,l-1,iterNumc,1e-16)
+!        Call CG to solve for ec
+!         call CG(ecc,xcc_in,rcc_smooth,l-1,iterNumc,1e-16)
          call CG(ec(0:ND1c,0:ND2c,1:TotNum_DM),xc_in(0:ND1c,0:ND2c,1:TotNum_DM),&
          rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),l-1,iterNumc,1e-16)
       
