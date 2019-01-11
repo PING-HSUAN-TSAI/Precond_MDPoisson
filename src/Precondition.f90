@@ -1285,7 +1285,7 @@
 !         lbw = 4 * (ND2+1) * (ND2+1)
          call dsygv(1,'V','U',ND2+1,Ly(0:ND2,0:ND2,DDK),&
                ND2+1,By(0:ND2,0:ND2,DDK),ND2+1,lamy(0:ND2,DDK),bwy,lbw,info)
-         write(10,*)'checking info',info
+         write(10,*)'checking info of dsygv',info
       enddo
       write(10,*)'Complete diagonalize Ly operator'
       
