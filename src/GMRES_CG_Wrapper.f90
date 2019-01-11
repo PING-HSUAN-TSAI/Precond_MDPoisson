@@ -15,7 +15,7 @@
       real(kind=8):: tmp_pro, glsc2, rnorm, err, glamax, tol
       real(kind=8) :: error_precond(0:LD1,0:LD2,1:TotNum_DM)
 
-      Nx = PolyDegN_DM(1,1,1); Ny = PolyDegN_DM(2,1,1)
+      Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
       
       tol = 1e-8
       
@@ -44,8 +44,7 @@
          call vcycle_projection(Nx,Ny,&
                                 r_wrapper,p_cond,l)
 
-!     Start Projection method ( fixme)
-      
+!        Start Projection method ( fixme)
          if (k > 1) then
       
             do index_pro = 1, k-1
@@ -80,7 +79,7 @@
          pAp_wrapper = glsc2(Nx,Ny,p_cond,w,l)
       
       
-!     Normalize
+!        Normalize
          do DDK = 1, TotNum_DM
             ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
       
@@ -88,7 +87,7 @@
                                        / sqrt(pAp_wrapper)
          enddo
       
-!     Normalize
+!        Normalize
          do DDK = 1, TotNum_DM
             ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
       
@@ -127,8 +126,7 @@
 9998 format(' ',' ', 'Projection step',i5,4es24.15)
 9997 format(' ',' ', 'End:',i5,'/',es10.4,1x,es10.4)
       end subroutine Projection_WRAPPER
-      !================================================================
-      !================================================================
+!----------------------------------------------------------------
       subroutine vcycle_projection(LD1,LD2,ri,po,l)
       use Legendre
       use MD2D_Grid
@@ -265,11 +263,12 @@
                         * (PolyDegN_DM(2,DDK,l)+1)
          enddo
       
-            call chk_amax('xc1',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
-            write(*,*)'check point: before CG'
-            xc_in = 0
-            call chk_amax('xci',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
-!     Calling CG to solve for ec
+         call chk_amax('xc1',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
+         write(*,*)'check point: before CG'
+         xc_in = 0
+         call chk_amax('xci',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
+
+!        Call CG to solve for ec
          call CG(ec,xc_in,rc_smooth,l-1,6000,1e-20)
       
          do DDK = 1 ,TotNum_DM
@@ -306,4 +305,3 @@
       
       call copy(po,x_vcp,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
       end subroutine
-      
