@@ -56,8 +56,10 @@
       
       real(kind=8), save, allocatable :: z_ov(:,:,:)
       real(kind=8), save, allocatable :: z_ov_sol(:,:,:)
-      real(kind=8), save, allocatable :: bwx(:,:)
-      real(kind=8), save, allocatable :: bwy(:,:)
+!      real(kind=8), save, allocatable :: bwx(:,:)
+!      real(kind=8), save, allocatable :: bwy(:,:)
+      real(kind=8), save, allocatable :: bwx(:)
+      real(kind=8), save, allocatable :: bwy(:)
       real(kind=8), save, allocatable :: Diagonal(:,:)
       real(kind=8), save, allocatable :: DDiagonal(:,:,:)
       real(kind=8), save, allocatable :: Sx_t(:,:,:)
@@ -334,8 +336,10 @@
                   lamy(0:ND2,1:TotNumDomain), &
                   lamxx(0:ND1,1:TotNumDomain,mg_len), &
                   lamyy(0:ND2,1:TotNumDomain,mg_len), &
-                  bwx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
-                  bwy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
+                  bwx(1000),&
+                  bwy(1000),&
+!                  bwx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
+!                  bwy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain), &
                   bwxx(0:4*(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
                   bwyy(0:4*(ND1+1)*(ND2+1),1:TotNumDomain,mg_len), &
                   Diagonal(1:(ND1+1)*(ND2+1),1:TotNumDomain), &
