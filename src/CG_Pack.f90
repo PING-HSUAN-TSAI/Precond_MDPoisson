@@ -87,7 +87,7 @@
 9999 format(' ',' ', 'CG   : iteration#',i5,1p3e12.4)
          return
       end subroutine CG
-!======================================================================
+!----------------------------------------------------------------------
       subroutine axhelm2(LD1,LD2,u,Au,l)
       use MD2D_Grid    ! MD2D_Grid.f90
       use State_Var    ! State_Var.f90
@@ -134,12 +134,12 @@
          ND2=PolyDegN_DM(2,DDK,l)
       !   compute gradient x
       !open(181,file="u.text",position="append",action="write")
-      do j=0,ND2
-      do i=0,ND1
-      write(*,*)i,j,u(i,j,DDK)
-!      !write(181,fmt="(2I3,1x,1E11.5e3)")i,j,u(i,j,DDK)
-      enddo
-      enddo
+!      do j=0,ND2
+!      do i=0,ND1
+!      write(*,*)i,j,u(i,j,DDK)
+!!      !write(181,fmt="(2I3,1x,1E11.5e3)")i,j,u(i,j,DDK)
+!      enddo
+!      enddo
       !close(181)
          dudx(0:ND1,0:ND2) = Matmul(Diff_xi1(0:ND1,0:ND1,ND1), &
                                            u(0:ND1,0:ND2,DDK))
@@ -520,37 +520,33 @@
       
       return
       
-      
       end subroutine axhelm2
-      !=============================================================================================
-      subroutine inner_product(LD1,LD2,vector1,vector2,product,l)
+!---------------------------------------------------------------------------------------------
+      subroutine inner_product(LD1,LD2,vector1,vector2,tmp,l)
+
       use MD2D_Grid    ! MD2D_Grid.f90
       use CG_Var       ! CG_Var.f90
+
       implicit none
       
       integer:: i,j, LD1, LD2, l
       real(kind=8) :: vector1(0:LD1,0:LD2,1:TotNum_DM) 
       real(kind=8) :: vector2(0:LD1,0:LD2,1:TotNum_DM) 
-      real(kind=8) :: product
+      real(kind=8) :: tmp 
       
-      product=0
+      tmp=0.0
       
       do DDK=1,TotNum_DM
-        ND1=PolyDegN_DM(1,DDK,l)
-        ND2=PolyDegN_DM(2,DDK,l)
+         ND1=PolyDegN_DM(1,DDK,l)
+         ND2=PolyDegN_DM(2,DDK,l)
          do j=0,ND2
-          do i=0,ND1
-           product = product + (vector1(i,j,DDK) * vector2(i,j,DDK))
-          enddo
+            do i=0,ND1
+            tmp = tmp + (vector1(i,j,DDK) * vector2(i,j,DDK))
+            enddo
          enddo
       enddo
 
       return
       end subroutine
-      !===============================================================================================
-      
-      
-      
-      
-      
+!-----------------------------------------------------------------------------------------------
       
