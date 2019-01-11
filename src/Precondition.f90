@@ -1240,7 +1240,7 @@
 !         lbw =  4 * (ND1+1) * (ND1+1) 
          call dsygv(1,'V','U',ND1+1,Lx(0:ND1,0:ND1,DDK),&
                ND1+1,Bx(0:ND1,0:ND1,DDK),ND1+1,lamx(0:ND1,DDK),bwx,lbw,info)
-         write(10,*)'checking info',info
+         write(10,*)'checking info of dsygv',info
       enddo
       write(10,*)'Complete diagonalize Lx operator'
 
