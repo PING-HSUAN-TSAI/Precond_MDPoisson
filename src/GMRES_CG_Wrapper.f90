@@ -1,16 +1,19 @@
-      subroutine Projection_WRAPPER(l,step)
+      subroutine Projection_WRAPPER(LD1,LD2,l,step)
+
       use Legendre
       use MD2D_Grid
       use State_Var
       use CG_Var
       use Multigrid_Var
+
       implicit none
       
       integer :: step !-Gram-Schmidt step
       integer :: index_pro, index_k, Nx, Ny
       integer :: k, i, j, ND1p, ND2p,l, ND1c, ND2c
+      integer :: LD1,LD2
       real(kind=8):: tmp_pro, glsc2, rnorm, err, glamax, tol
-      real(kind=8) :: error_precond(0:PolyDegN_DM(1,1,1),0:PolyDegN_DM(2,1,1),1:TotNum_DM)
+      real(kind=8) :: error_precond(0:LD1,0:LD2,1:TotNum_DM)
 
       Nx = PolyDegN_DM(1,1,1); Ny = PolyDegN_DM(2,1,1)
       
