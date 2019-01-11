@@ -671,7 +671,7 @@
       Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
 
       N_vcycle = 1
-      m_smooth = 1
+      m_smooth = 10
       smoothpar = 1.0 !2.d0/3.d0
       
 
@@ -681,6 +681,8 @@
       x_vc_ini = 0.d0 ! initial gues
       
       do vcycle = 1, N_vcycle
+
+         xc_in=0.0
 
          call copy(x_vc,x_vc_ini,Nx,Ny,l)
 
@@ -731,6 +733,7 @@
 
             call axhelm2(Nx,Ny,x_vc,Ax_vc,l)
             call add3s2(r_smooth,b_smooth,Ax_vc,1.0,-1.0,Nx,Ny,l)
+            call chk_amax('aJr',r_smooth,Nx,Ny,l)
 
          enddo ! smooth
          call outpost(r_smooth(0:ND1,0:ND2,1:TotNum_DM),l,'aJr')
@@ -777,9 +780,13 @@
          enddo
          call add2s2(x_vc,ef,1.0,Nx,Ny,l)
 
+         call outpost(x_vc(0:ND1,0:ND2,1:TotNum_DM),l,'xvc')
+
          call add3s2(error_vc,v,x_vc,1.0,-1.0,Nx,Ny,l)
 
+!        increase c_sigma -> x_vc better 
          call chk_amax('ers',error_vc,Nx,Ny,l)
+         call outpost(error_vc(0:ND1,0:ND2,1:TotNum_DM),l,'evc')
          call copy(x_vc_ini,x_vc,Nx,Ny,l)
       
          enddo ! vcycle
@@ -1005,12 +1012,12 @@
          Edge_Num=4
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Lx(0:ND1,0,DDK) = Lx(0:ND1,0,DDK) &
                                + (tauD(0:ND1,0,Edge_Num,DDK,level)   &
                                -  tau_tilde(0:ND1,1,Edge_Num,DDK,level))
@@ -1039,12 +1046,12 @@
          Edge_Num=2
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Lx(0:ND1,ND2,DDK) = Lx(0:ND1,ND2,DDK) &
                                  +(    tauD(0:ND1,ND2,Edge_Num,DDK,level) &
                                  - tau_tilde(0:ND1,ND2-1,Edge_Num,DDK,level))
@@ -1086,12 +1093,12 @@
          Edge_Num=1
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Ly(0:ND1,0,DDK) = Ly(0:ND1,0,DDK) &
                                + (    tauD(0,0:ND2,Edge_Num,DDK,level) &
                                - tau_tilde(1,0:ND2,Edge_Num,DDK,level))
@@ -1119,12 +1126,12 @@
          Edge_Num=3
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-               do j=0,ND2
-                  do i=0,ND1
-                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-                  enddo
-               enddo
+!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+!               do j=0,ND2
+!                  do i=0,ND1
+!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+!                  enddo
+!               enddo
                Ly(0:ND1,ND2,DDK) = Ly(0:ND1,ND2,DDK) &
                                  + (    tauD(ND1,0:ND2,Edge_Num,DDK,level)  &
                                  - tau_tilde(ND1-1,0:ND2,Edge_Num,DDK,level))  !&
