@@ -176,3 +176,14 @@
       return
 
       end subroutine
+!=============================================================================================
+      subroutine rzero(A,n)
+
+      implicit none
+      real(kind=8) :: A(1)
+      integer :: i,n
+
+      do i=1,n
+         A(i) = 0.0
+      enddo
+      end
