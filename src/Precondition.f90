@@ -958,25 +958,14 @@
                    (Jacobin(0:ND1,0:ND2,DDK,level) &
                 *     a_pts(0:ND1,0:ND2,DDK,level) ) &
                 * (dxi1_dx1(0:ND1,0:ND2,DDK,level)**2.0) &
-!                +  dxi1_dx2(0:ND1,0:ND2,DDK,level)**2.0 ) &
                 *  Diff_xi1(0:ND1,0:ND1,ND1)
-!         dudx_tmp(0:ND1,0:ND1,DDK) = &
-!                     a_pts(0:ND1,0:ND2,DDK,level)  &
-!                *  Diff_xi1(0:ND1,0:ND1,ND1) &
-!                * (dxi1_dx1(0:ND1,0:ND2,DDK,level)) 
       
          dudy_tmp(0:ND2,0:ND2,DDK) = &
                    (Jacobin(0:ND1,0:ND2,DDK,level) &
                 *     a_pts(0:ND1,0:ND2,DDK,level) ) &
-!                * (dxi2_dx1(0:ND1,0:ND2,DDK,level)**2.0 &
                 *  (dxi2_dx2(0:ND1,0:ND2,DDK,level)**2.0 ) &
                 *  Diff_xi1(0:ND1,0:ND1,ND1)
 
-!         dudy_tmp(0:ND2,0:ND2,DDK) = &
-!                     a_pts(0:ND1,0:ND2,DDK,level)  &
-!                *  Diff_xi1(0:ND1,0:ND1,ND1) &
-!                *  (dxi2_dx2(0:ND1,0:ND2,DDK,level) )
-!      
          Lx(0:ND1,0:ND1,DDK) = - Matmul(Diff_xi1(0:ND1,0:ND1,ND1), &
                                            dudx_tmp(0:ND1,0:ND1,DDK) )
       
@@ -984,7 +973,8 @@
                                            dudy_tmp(0:ND2,0:ND2,DDK) )
       enddo
       
-      call dumpopt(Lx,level,'Lwo')
+      call dumpopt(Lx,level,'Lxo')
+      call dumpopt(Ly,level,'Lyo')
 
 !     Start adding penalty for every DDK
       do DDK=1,TotNum_DM
@@ -995,12 +985,12 @@
          Edge_Num=4
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-!               do j=0,ND2
-!                  do i=0,ND1
-!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-!                  enddo
-!               enddo
+               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+               do j=0,ND2
+                  do i=0,ND1
+                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+                  enddo
+               enddo
                Lx(0:ND1,0,DDK) = Lx(0:ND1,0,DDK) &
                                + (tauD(0:ND1,0,Edge_Num,DDK,level)   &
                                -  tau_tilde(0:ND1,1,Edge_Num,DDK,level))
@@ -1029,12 +1019,12 @@
          Edge_Num=2
          select case (BC_Type(Edge_Num,DDK))
             case(1)
-!               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-!               do j=0,ND2
-!                  do i=0,ND1
-!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-!                  enddo
-!               enddo
+               write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
+               do j=0,ND2
+                  do i=0,ND1
+                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+                  enddo
+               enddo
                Lx(0:ND1,ND2,DDK) = Lx(0:ND1,ND2,DDK) &
                                  +(    tauD(0:ND1,ND2,Edge_Num,DDK,level) &
                                  - tau_tilde(0:ND1,ND2-1,Edge_Num,DDK,level))
@@ -1077,11 +1067,11 @@
          select case (BC_Type(Edge_Num,DDK))
             case(1)
                write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-!               do j=0,ND2
-!                  do i=0,ND1
-!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-!                  enddo
-!               enddo
+               do j=0,ND2
+                  do i=0,ND1
+                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+                  enddo
+               enddo
                Ly(0:ND1,0,DDK) = Ly(0:ND1,0,DDK) &
                                + (    tauD(0,0:ND2,Edge_Num,DDK,level) &
                                - tau_tilde(1,0:ND2,Edge_Num,DDK,level))
@@ -1104,16 +1094,17 @@
                                - SigmaHat(0,Edge_Num,DDK,level) *2 &
                                * Diff_xi1(0,0:ND2,ND2)
          end select
-!     side 3
+
+!        side 3
          Edge_Num=3
          select case (BC_Type(Edge_Num,DDK))
             case(1)
                write(10,*)'Edge:',Edge_Num,'dirichlet penalty'
-!               do j=0,ND2
-!                  do i=0,ND1
-!                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
-!                  enddo
-!               enddo
+               do j=0,ND2
+                  do i=0,ND1
+                     write(10,*)i,j,tauD(i,j,Edge_Num,DDK,level),tau_tilde(i,j,Edge_Num,DDK,level)
+                  enddo
+               enddo
                Ly(0:ND1,ND2,DDK) = Ly(0:ND1,ND2,DDK) &
                                  + (    tauD(ND1,0:ND2,Edge_Num,DDK,level)  &
                                  - tau_tilde(ND1-1,0:ND2,Edge_Num,DDK,level))  !&
@@ -1126,16 +1117,18 @@
 !     Add interface penalty : first set of dirichlet
                Ly(0:ND1,ND2,DDK) = Ly(0:ND1,ND2,DDK) &
                                  + tau1(ND1,0:ND2,Edge_Num,DDK,level) 
-               Ly(ND1,ND2,DDK) = Ly(ND1,ND2,DDK) &
-                               + tau2(ND1-1,Edge_Num,DDK,level) !&
+               Ly(ND1  ,ND2,DDK) = Ly(ND1,ND2,DDK) &
+                                 + tau2(ND1-1,Edge_Num,DDK,level) !&
 !     Add interface penalty : second set of dirichlet
-               Ly(ND1,ND2,DDK) = Ly(ND1,ND2,DDK) &
-                               + Sigma_tild(ND1-1,Edge_Num,DDK,level) !&
+               Ly(ND1  ,ND2,DDK) = Ly(ND1,ND2,DDK) &
+                                 + Sigma_tild(ND1-1,Edge_Num,DDK,level) !&
 !     Add interface penalty : neumann
                Ly(ND1,0:ND2,DDK) = Ly(ND1,0:ND2,DDK) &
                                  + SigmaHat(ND2,Edge_Num,DDK,level) *2 &
                                  * Diff_xi1(ND2,0:ND2,ND2)
          end select
+
+         call dumpopt(Ly,level,'Lyw')
       enddo !DDK
 
 !      do DDK=1,TotNum_DM
@@ -1170,6 +1163,9 @@
          enddo
       enddo
 
+      call dumpopt(Lx,level,'MLx')
+      call dumpopt(Ly,level,'MLy')
+
 !     Construct Matrix Bx and By which will be used in solving the generalized eigenvalue problem Ax = lambda B x
       do DDK = 1, TotNum_DM
          ND1=PolyDegN_DM(1,DDK,level); ND2=PolyDegN_DM(2,DDK,level)
@@ -1180,6 +1176,8 @@
             By(j,j,DDK) = LGLWeights(j,ND2)
          enddo
       enddo
+
+      call dumpopt(Bx,level,'Mas')
       
 !     Checking whether Lx operator is SPD or not
       open(637,file='Lx.text')
@@ -1207,11 +1205,19 @@
 
       do DDK = 1, TotNum_DM
          ND1 = PolyDegN_DM(1,DDK,level)
-         lbw =  (ND1+1) * (ND1+1)
+         lbw = -1
          call dsygv(1,'V','U',ND1+1,Lx(0:ND1,0:ND1,DDK),&
                ND1+1,Bx(0:ND1,0:ND1,DDK),ND1+1,lamx(0:ND1,DDK),bwx,lbw,info)
+         lbw = int(bwx(1))
+         write(10,*)'lbw',lbw
+!         lbw =  4 * (ND1+1) * (ND1+1) 
+         call dsygv(1,'V','U',ND1+1,Lx(0:ND1,0:ND1,DDK),&
+               ND1+1,Bx(0:ND1,0:ND1,DDK),ND1+1,lamx(0:ND1,DDK),bwx,lbw,info)
+         write(10,*)'checking info',info
       enddo
       write(10,*)'Complete diagonalize Lx operator'
+
+      call dumpevec(Lx,level,'lll')
       
 !     Storing the eigenvectors that are not normalized yet
       do DDK = 1, TotNum_DM
@@ -1219,6 +1225,7 @@
          Sx_t(0:ND1,0:ND1,DDK) = transpose(Lx(0:ND1,0:ND1,DDK))
          Sx(0:ND1,0:ND1,DDK) = Lx(0:ND1,0:ND1,DDK)
       enddo
+
 !     Start normalizing the eigenvectors of Lx
       do DDK = 1, TotNum_DM
          ND1 = PolyDegN_DM(1,DDK,level)
@@ -1230,6 +1237,7 @@
 !     We need the diagonal part of Sx' B Sx to normalize the eigenvector
          SxBSx(0:ND1,0:ND1,DDK) = Matmul(Sx_t(0:ND1,0:ND1,DDK), &
                                           BSx(0:ND1,0:ND1,DDK))
+         call dumpevec(SxBSx,level,'Sxb')
          do j=0,ND1
             do i =0,ND1
             Sx_norm(i,j,DDK) = Sx(i,j,DDK) / sqrt(SxBSx(j,j,DDK))
@@ -1246,6 +1254,7 @@
          lbw = 4 * (ND2+1) * (ND2+1)
          call dsygv(1,'V','U',ND2+1,Ly(0:ND2,0:ND2,DDK),&
                ND2+1,By(0:ND2,0:ND2,DDK),ND2+1,lamy(0:ND2,DDK),bwy,lbw,info)
+         write(10,*)'checking info',info
       enddo
       write(10,*)'Complete diagonalize Ly operator'
       
@@ -1275,6 +1284,10 @@
          Sy_t_norm(0:ND1,0:ND1,DDK) = transpose(Sy_norm(0:ND1,0:ND1,DDK))
       enddo
       write(10,*)'Complete normalize the eigenvector of Ly operator'
+
+
+      call dumpevec(Sx,level,'Sxo')
+      call dumpevec(Sx_norm,level,'Sxw')
 
 !      write(*,*)'Output the normalizd eigenvectors of L_x and L_y'
 !      do DDK = 1, TotNum_DM
