@@ -10,8 +10,9 @@
       use INPUT
       implicit none
       
-      integer :: i, j, sovflag, ierr
-      integer :: iterNum, tot_size, LD1, LD2, n
+      integer :: i, j,sovflag,ierr
+      integer :: iterNum,tot_size,n
+      integer :: LD1,LD2,LD1c,LD2c
 
       OPEN (UNIT=10,FILE='logfile')
       OPEN (UNIT=9,FILE='pspm2d.rea',STATUS='OLD',iostat=ierr)
@@ -154,7 +155,7 @@
       else if (democase .eq. 3 ) then
 
          call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
-         call Construct_Lx_Ly_operator(mg_lmax) !-Precondition.f90
+         call Construct_Lx_Ly_operator(LD1,LD2,mg_lmax) !-Precondition.f90
          write(10,*)'Complete Constructing Lx Ly operator'
 
          call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
@@ -162,8 +163,9 @@
          write(10,*)'Complete calling Interp_mat which set up & 
          Jhx and Jhy'
 
+         LD1c = PolyDegN_DM(1,1,mg_lmax-1); LD2c = PolyDegN_DM(2,1,mg_lmax-1)
          call alloc_mem_ovlapsmooth_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
-         call Smoothing_Pack_Overlapping(LD1,LD2,mg_lmax)
+         call Smoothing_Pack_Overlapping(LD1,LD2,LD1c,LD2c,mg_lmax)
          write(10,*)'Complete Smoothing Residue'
 
          call CG (potent,x_vc,rhs,mg_lmax,iterNum,1e-16) !--CG_Pack.f90
@@ -174,23 +176,23 @@
          Nk = param(5)
          write(10,*)'Total number of projection iteration:',Nk
       
-         call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,1),TotNum_DM,mg_lmax)
-         call Construct_Lx_Ly_operator(1) !-Precondition.f90
+         call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
+         call Construct_Lx_Ly_operator(LD1,LD2,mg_lmax) !-Precondition.f90
          write(10,*)'Complete Constructing Lx Ly operator'
 
-         call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,1),TotNum_DM)      
-         call Interp_mat
+         call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)      
+         call Interp_mat(mg_lmax)
          write(10,*)'Complete calling Interp_mat & 
          which set up Jhx and Jhy'
 
 !         call hsmg_setup
 
-         call alloc_mem_wrapper_var(PolyDegN_DM(1,1,1),PolyDegN_DM(1,1,2),TotNum_DM,Nk)
-         call Projection_WRAPPER(1,Nk)
+         call alloc_mem_wrapper_var(PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(1,1,,mg_lmax-1),TotNum_DM,Nk)
+         call Projection_WRAPPER(LD1,LD2,mg_lmax,Nk)
          write(10,*)'Complete calling Projection & 
          method with preconditioning'
       
-         call copy(potent,x_precond,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1),1)
+         call copy(potent,x_precond,PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(2,1,mg_lmax),mg_lmax)
 !------------------------------------------------------------------
       else if (democase .eq. 5) then
 
