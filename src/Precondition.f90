@@ -743,7 +743,9 @@
       
       
 !     Calling CG to solve for ec
-         call CG(ec,xc_in,rc_smooth,l-1,iterNumc,1e-16)
+!         call CG(ec,xc_in,rc_smooth,l-1,iterNumc,1e-16)
+         call CG(ec(0:ND1c,0:ND2c,1:TotNum_DM),xc_in(0:ND1c,0:ND2c,1:TotNum_DM),&
+         rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),l-1,iterNumc,1e-16)
       
          do DDK = 1 ,TotNum_DM
             ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
