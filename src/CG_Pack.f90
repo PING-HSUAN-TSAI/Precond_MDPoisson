@@ -39,13 +39,10 @@
       real(kind=8):: glsc2
 
       Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
-
-!      tol = 1E-8
       
 !     initialize Ax matrix
       call axhelm2(Nx,Ny,x_in,Ax,l)
 
-      
 !     conjugate gradient use residual as the initial direction
 !     initial residue and p
       call add3s2(r,f,Ax,1.0,-1.0,Nx,Ny,l)
@@ -67,7 +64,6 @@
          rsnew = glsc2(Nx,Ny,r,r,l)
 
          if (abs(rsnew) .lt. tol) then
-      
             write(10,fmt="(A36,i5,es24.15)")" # of iterations to reach the tolerance: ",k,tol
             exit
          endif
