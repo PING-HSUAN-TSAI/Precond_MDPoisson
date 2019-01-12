@@ -128,30 +128,37 @@
       end subroutine Projection_WRAPPER
 !----------------------------------------------------------------
       subroutine vcycle_projection(LD1,LD2,ri,po,l)
+
       use Legendre
       use MD2D_Grid
       use State_Var
       use CG_Var
       use Multigrid_Var
       use Input
+
       implicit none
       
       integer :: i, j, LD1,LD2, vcycle
       integer :: m_vcycle, m_smooth, TotN, TotNc
       integer :: k, n, ND1p, ND2p,l, ND1c, ND2c, ind_JS
-      real(kind=8):: smoothpar, err_sm, r_sm, err_vc, max_ef,glamax
+      real(kind=8) :: smoothpar, err_sm, r_sm, err_vc, max_ef,glamax
+
+!     vcycle variables
       real(kind=8) :: ri(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: r(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: po(0:LD1,0:LD2,1:TotNum_DM)
+      real(kind=8) :: x_vcp(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: errvec_vc(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: errvec_sm(0:LD1,0:LD2,1:TotNum_DM)
-      real(kind=8) :: x_vcp(0:LD1,0:LD2,1:TotNum_DM)
+
+!     working arrays
       real(kind=8) :: tmp(0:LD1,0:LD2,1:TotNum_DM),tmp1(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp2(0:LD1,0:LD2,1:TotNum_DM),tmp3(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp4(0:LD1,0:LD2,1:TotNum_DM),tmp5(0:LD1,0:LD2,1:TotNum_DM)
       real(kind=8) :: tmp6(0:LD1,0:LD2,1:TotNum_DM)      
       real(kind=8) :: tmp7(0:LD1,0:LD2,1:TotNum_DM)      
       real(kind=8) :: tmp8(0:LD1,0:LD2,1:TotNum_DM)      
+
       write(10,*)'Nx,Ny:',LD1,LD2
 
       call chk_amax('ri',ri,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l) 
@@ -166,11 +173,12 @@
       
       do vcycle = 1, m_vcycle
       
-!     Additive Jacobi Schwartz
+!        Additive Jacobi Schwartz
          do k = 1,m_smooth
+
             z_ov = 0*x_vcp
       
-!     Multiplying the inverse of the BlockL operator.
+!           Multiplying the inverse of the BlockL operator.
             do ind_JS = 1,1
                do DDK = 1, TotNum_DM
                   ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
@@ -264,12 +272,14 @@
          enddo
       
          call chk_amax('xc1',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
-         write(*,*)'check point: before CG'
+         write(10,*)'check point: before CG'
          xc_in = 0
          call chk_amax('xci',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
 
 !        Call CG to solve for ec
-         call CG(ec,xc_in,rc_smooth,l-1,6000,1e-20)
+!         call CG(ec,xc_in,rc_smooth,l-1,6000,1e-20)
+         call CG(ec(0:ND1c,0:ND2c,1:TotNum_DM),xc_in(0:ND1c,0:ND2c,1:TotNum_DM),&
+         rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),l-1,TotNc,1e-16)
       
          do DDK = 1 ,TotNum_DM
             ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
