@@ -222,7 +222,10 @@
 !            enddo
 !            call chk_amax('zas',z_ov,PolyDegN_Max(1),PolyDegN_Max(2),l)
       
+!           update solution
             call add2s2(x_vcp,z_ov,smoothpar,Nx,Ny,l)
+
+!           compute smoothing error
             call add3s2(errvec_sm,v,x_vcp,1.0,-1.0,Nx,Ny,l)
             err_sm = glamax(errvec_sm,Nx,Ny,l)
             call chk_amax('err',errvec_sm,Nx,Ny,l)
@@ -292,13 +295,12 @@
 !         call hsmg_intp(ef(0:mg_nx(3),0:mg_ny(3),1:TotNum_DM),ec(0:mg_nx(2),0:mg_ny(2),1:TotNum_DM),&
 !         2,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1))
 
-         max_ef = glamax(ef,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
-         call add2s2(x_vcp,ef,1.0,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
+         max_ef = glamax(ef,Nx,Ny,l)
+         call add2s2(x_vcp,ef,1.0,Nx,Ny,l)
       
-!     Compare the x_vc with exact solution after doing smoothing and coarse correction
-
-         call add3s2(errvec_vc,v,x_vcp,1.0,-1.0,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
-         err_vc = glamax(errvec_vc,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
+!        Compare the x_vc with exact solution after doing smoothing and coarse correction
+         call add3s2(errvec_vc,v,x_vcp,1.0,-1.0,Nx,Ny,l)
+         err_vc = glamax(errvec_vc,Nx,Ny,l)
 
          write(10,1003)vcycle,err_vc,max_ef
 
@@ -306,5 +308,5 @@
       
       enddo ! vcycle
       
-      call copy(po,x_vcp,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
+      call copy(po,x_vcp,Nx,Ny,l)
       end subroutine
