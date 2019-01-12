@@ -222,15 +222,15 @@
 !            enddo
 !            call chk_amax('zas',z_ov,PolyDegN_Max(1),PolyDegN_Max(2),l)
       
-            call add2s2(x_vcp,z_ov,smoothpar,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
-            call add3s2(errvec_sm,v,x_vcp,1.0,-1.0,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
-            err_sm = glamax(errvec_sm,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
-            call chk_amax('err',errvec_sm,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
+            call add2s2(x_vcp,z_ov,smoothpar,Nx,Ny,l)
+            call add3s2(errvec_sm,v,x_vcp,1.0,-1.0,Nx,Ny,l)
+            err_sm = glamax(errvec_sm,Nx,Ny,l)
+            call chk_amax('err',errvec_sm,Nx,Ny,l)
 
-            call axhelm2(PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),x_vcp,Ax_vc,l)
+            call axhelm2(Nx,Ny,x_vcp,Ax_vc,l)
       
-            call add2s2(r,Ax_vc,-1.0,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
-            r_sm = glamax(r,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
+            call add2s2(r,Ax_vc,-1.0,Nx,Ny,l)
+            r_sm = glamax(r,Nx,Ny,l)
 
             write(10,777)vcycle,m_smooth,err_sm,r_sm      
 
