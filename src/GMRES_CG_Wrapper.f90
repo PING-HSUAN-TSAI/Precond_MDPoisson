@@ -213,17 +213,6 @@
                enddo! DDK
             enddo
                
-!            do DDK=1,TotNum_DM
-!               ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
-!               do j=0,ND2
-!                  do i=0,ND1
-!                     n = i+1+j*(ND2+1)
-!                     z_ov(i,j,DDK) = z_ov(i,j,DDK)/scale_c(n,DDK)
-!                  enddo
-!               enddo
-!            enddo
-!            call chk_amax('zas',z_ov,PolyDegN_Max(1),PolyDegN_Max(2),l)
-      
 !           update solution
             call add2s2(x_vcp,z_ov,smoothpar,Nx,Ny,l)
 
