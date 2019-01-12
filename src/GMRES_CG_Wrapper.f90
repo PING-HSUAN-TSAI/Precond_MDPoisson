@@ -14,6 +14,9 @@
       integer :: LD1,LD2
       real(kind=8):: tmp_pro, glsc2, rnorm, err, glamax, tol
       real(kind=8) :: error_precond(0:LD1,0:LD2,1:TotNum_DM)
+      
+      write(10,*)" "
+      write(10,*)"Inside projection wrapper"
 
       Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
       
@@ -110,6 +113,7 @@
          rnorm = sqrt(rnorm)
 
          write(10,9998)k,pAp_wrapper,alpha_wrapper,rnorm,err
+         write(10,*)" "
 
          if (abs(rnorm) .lt. tol) then
             exit
@@ -118,6 +122,9 @@
       enddo ! end of the projection method
 
       write(10,9997)k,err,tol
+
+      write(10,*)"Existing projection wrapper"
+      write(10,*)" "
       
 9998 format(' ', 'Projection step',i5,4es24.15)
 9997 format(' ', 'End:',i5,'/',es10.4,1x,es10.4)
@@ -159,8 +166,7 @@
 
       Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
 
-      call chk_amax('ri',ri,Nx,Ny,l) 
-      call chk_amax('po',po,Nx,Ny,l)
+!     ri should not be modified
       call copy(r,ri,Nx,Ny,l)
 
       m_vcycle = 1
@@ -222,9 +228,10 @@
             call add2s2(x_vcp,z_ov,smoothpar,Nx,Ny,l)
 
 !           compute smoothing error
+!           smoothing error only makes sense when vcycle is called first time
+!           Might fix this later
             call add3s2(errvec_sm,v,x_vcp,1.0,-1.0,Nx,Ny,l)
             err_sm = glamax(errvec_sm,Nx,Ny,l)
-            call chk_amax('err',errvec_sm,Nx,Ny,l)
 
             call axhelm2(Nx,Ny,x_vcp,Ax_vc,l)
       
@@ -266,6 +273,7 @@
 
 !        Call CG to solve for ec
 !         call CG(ec,xc_in,rc_smooth,l-1,6000,1e-20)
+         write(10,*)"Coarse gird solved"
          call CG(ec(0:ND1c,0:ND2c,1:TotNum_DM),xc_in(0:ND1c,0:ND2c,1:TotNum_DM),&
          rc_smooth(0:ND1c,0:ND2c,1:TotNum_DM),l-1,TotNc,1e-16)
       
@@ -290,12 +298,15 @@
          call add2s2(x_vcp,ef,1.0,Nx,Ny,l)
       
 !        Compare the x_vc with exact solution after doing smoothing and coarse correction
-         call add3s2(errvec_vc,v,x_vcp,1.0,-1.0,Nx,Ny,l)
-         err_vc = glamax(errvec_vc,Nx,Ny,l)
+!         call add3s2(errvec_vc,v,x_vcp,1.0,-1.0,Nx,Ny,l)
+!         err_vc = glamax(errvec_vc,Nx,Ny,l)
+!         write(10,1003)vcycle,err_vc,max_ef
 
-         write(10,1003)vcycle,err_vc,max_ef
+!        no need err_vc since it is not solving the same problem
+         write(10,1003)vcycle,max_ef
 
-1003 format(' ', 'vcycle:',i2,1x,'err_vc:',es10.3,1x,'ef:',es10.3)
+!1003 format(' ', 'vcycle:',i2,1x,'err_vc:',es10.3,1x,'ef:',es10.3)
+1003 format(' ', 'vcycle:',i2,1x,'ef:',es10.3)
       
       enddo ! vcycle
       
