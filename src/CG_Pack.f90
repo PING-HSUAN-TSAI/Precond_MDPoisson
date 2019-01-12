@@ -63,10 +63,11 @@
       
          rsnew = glsc2(Nx,Ny,r,r,l)
 
-         if (abs(rsnew) .lt. tol) then
-            write(10,fmt="(A41,i5,es24.15)")" # of iterations to reach the tolerance: ",k,tol
-            exit
-         endif
+         if (abs(rsnew) .lt. tol) goto 900
+!         if (abs(rsnew) .lt. tol) then
+!            write(10,fmt="(A41,i5,es24.15)")" # of iterations to reach the tolerance: ",k,tol
+!            exit
+!         endif
       
          call add3s2(p,r,p,1.0,(rsnew/rsold),Nx,Ny,l)
       
@@ -74,8 +75,9 @@
       
       enddo! iteration
 
+900   continue
       call copy(x_out,x_in,Nx,Ny,l)
-      
+
       write(10,9999) k,tol
       
 9999 format(' ', 'CG   : iteration#',i5,1p3e12.4)
