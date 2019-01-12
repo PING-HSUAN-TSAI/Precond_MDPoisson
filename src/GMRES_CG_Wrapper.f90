@@ -141,6 +141,7 @@
       integer :: i, j, LD1,LD2, vcycle
       integer :: m_vcycle, m_smooth, TotN, TotNc
       integer :: k, n, ND1p, ND2p,l, ND1c, ND2c, ind_JS
+      integer :: Nx,Ny
       real(kind=8) :: smoothpar, err_sm, r_sm, err_vc, max_ef,glamax
 
 !     vcycle variables
@@ -159,11 +160,12 @@
       real(kind=8) :: tmp7(0:LD1,0:LD2,1:TotNum_DM)      
       real(kind=8) :: tmp8(0:LD1,0:LD2,1:TotNum_DM)      
 
-      write(10,*)'Nx,Ny:',LD1,LD2
 
-      call chk_amax('ri',ri,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l) 
-      call chk_amax('po',po,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
-      call copy(r,ri,PolyDegN_DM(1,1,l),PolyDegN_DM(2,1,l),l)
+      Nx = PolyDegN_DM(1,1,l); Ny = PolyDegN_DM(2,1,l)
+
+      call chk_amax('ri',ri,Nx,Ny,l) 
+      call chk_amax('po',po,Nx,Ny,l)
+      call copy(r,ri,Nx,Ny,l)
 
       m_vcycle = 1
       m_smooth = 1
