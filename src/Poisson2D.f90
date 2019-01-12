@@ -1,4 +1,5 @@
       Program Poisson2D
+
       use constants    ! constants.f90
       use MD2D_Grid    ! MD3D_Grid.f90
       use Legendre     ! Legendre.f90
@@ -8,6 +9,7 @@
       use Multigrid_Var! Multigrid_Var.f90
       use GMRES        ! GMRES.f90
       use INPUT
+
       implicit none
       
       integer :: i, j,sovflag,ierr
@@ -195,7 +197,7 @@
       else if (democase .eq. 5) then
 
          call alloc_mem_Lx_Ly_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM,mg_lmax)
-         call Construct_Lx_Ly_operator(mg_lmax) !-Precondition.f90
+         call Construct_Lx_Ly_operator(LD1,LD2,mg_lmax) !-Precondition.f90
 !         write(10,*)'Complete Constructing Lx Ly operator'
 
          call alloc_mem_Interpolatematrix_var(PolyDegN_DM(1,1,mg_lmax),TotNum_DM)
@@ -218,6 +220,7 @@
          write(10,*)'Complete calling GMRES with preconditioning'
 
       end if ! democase
+!------------------------------------------------------------------
 
       close(9)
       call Field_Final(1)
