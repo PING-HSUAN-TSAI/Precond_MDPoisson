@@ -211,15 +211,6 @@
                enddo! DDK
             enddo
                
-!            do DDK = 1, TotNum_DM
-!               ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
-!               do j=0,ND2
-!                  do i=0,ND1
-!                     z_ov_sol(i,j,DDK) = z_ov_sol(i,j,DDK) * smoothpar
-!                  enddo
-!               enddo
-!            enddo
-!            call chk_amax('zbs',z_ov,PolyDegN_Max(1),PolyDegN_Max(2),l)
 !            do DDK=1,TotNum_DM
 !               ND1 = PolyDegN_DM(1,DDK,l); ND2 = PolyDegN_DM(2,DDK,l)
 !               do j=0,ND2
