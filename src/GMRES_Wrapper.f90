@@ -47,31 +47,31 @@
             call copy  (gmres_rr,res,Nx,Ny,l) !-r = res
             call chk_amax('it0',gmres_rr,Nx,Ny,l)
          else
-!     update residual
+!           update residual
             call copy  (gmres_rr,res,Nx,Ny,l) !-r = res
             call chk_amax('it1',gmres_rr,Nx,Ny,l)
 
             call axhelm2(Nx,Ny,gmres_xx,gmres_ww,l) !-w = Ax
             call chk_amax('it2',gmres_ww,Nx,Ny,l)
 
-!-Compute initial residual r = r - w
+!           Compute initial residual r = r - w
             call add2s2(gmres_rr,gmres_ww,-1.0,Nx,Ny,l)
 
          endif
 
-!     Compute initial residual norm
+!        Compute initial residual norm
          gmres_gamma(1) = sqrt(glsc2(Nx,Ny,gmres_rr,gmres_rr,l)) ! gamma  = sqrt{ (r,r) }
          write(10,*)'gmres_gamma',gmres_gamma(1)
 
-!     Check for lucky convergence
+!        Check for lucky convergence
          rnorm = 0.
          if(gmres_gamma(1) .eq. 0.) goto 9000
          temp = 1./gmres_gamma(1)
 
          call chk_amax('it3',gmres_rr,Nx,Ny,l)
 
-!     Define first Krylov vector
-!     v  = r / gamma
+!        Define first Krylov vector
+!        v  = r / gamma
          do DDK = 1, TotNum_DM
             ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
             gmres_vv(0:ND1,0:ND2,DDK,1) = gmres_rr(0:ND1,0:ND2,DDK) &
@@ -81,7 +81,7 @@
          call chk_amax('it4',gmres_rr,Nx,Ny,l)
          call chk_amax('it5',gmres_vv(:,:,:,1),Nx,Ny,l)
 
-!     GMRES inner iteration
+!        GMRES inner iteration
          do j=1,m
             iter = iter+1
             call copy  (gmres_ww,gmres_vv(:,:,:,j),Nx,Ny,l)
@@ -103,19 +103,19 @@
 
             call chk_amax('it7',gmres_zz(:,:,:,j),Nx,Ny,l)
             call chk_amax('it8',gmres_ww,Nx,Ny,l)
-!     Matrix-vector product
+!           Matrix-vector product
             call axhelm2(Nx,Ny,gmres_zz(:,:,:,j),gmres_ww,l)
             call chk_amax('it9',gmres_ww,Nx,Ny,l)
 !------------------------------------------------------------------------
-!     Modified Gram-Schmidt orthogonalization
+!           Modified Gram-Schmidt orthogonalization
             do i=1,j
-!     h    = (w,v)
+!              h    = (w,v)
                gmres_h(i,j) = glsc2(Nx,Ny,gmres_ww,gmres_vv(:,:,:,i),l)
-!     w = w - h    v
+!              w = w - h    v
                call add2s2(gmres_ww,gmres_vv(:,:,:,i),-gmres_h(i,j),Nx,Ny,l)
             enddo
 !-------------------------------------------------------------------------
-!     Apply Givens rotations to new column of Hessenberg H
+!           Apply Givens rotations to new column of Hessenberg H
             do i=1,j-1
                temp = gmres_h(i,j)
                gmres_h(i  ,j) =  gmres_c(i)*temp &
@@ -147,8 +147,8 @@
 
             temp = 1./alpha
 
-!     Define next Krylov vector
-!     v = w / alpha
+!           Define next Krylov vector
+!           v = w / alpha
             do DDK = 1, TotNum_DM
                ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
                gmres_vv(0:ND1,0:ND2,DDK,j+1) = gmres_ww(0:ND1,0:ND2,DDK) * temp
@@ -171,7 +171,7 @@
                gmres_c(k) = temp/gmres_h(k,k)
          enddo
 
-!     Sum up Arnoldi vectors form approximate solution
+!        Sum up Arnoldi vectors form approximate solution
          do i=1,j
             call add2s2(gmres_xx,gmres_zz(:,:,:,i),gmres_c(i),Nx,Ny,l)
             ! x = x + c  z
