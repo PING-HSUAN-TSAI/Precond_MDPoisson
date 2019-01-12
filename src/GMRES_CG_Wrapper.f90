@@ -227,11 +227,7 @@
             call add2s2(r,Ax_vc,-1.0,Nx,Ny,l)
             r_sm = glamax(r,Nx,Ny,l)
 
-            write(10,777)vcycle,m_smooth,err_sm,r_sm      
-
          enddo ! smooth
-
-777  format(' ', 'vcycle:' ,i2,1x,'smoothing:',1x,i2,2e10.3)
 
 !     Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
       
@@ -292,10 +288,11 @@
 !         write(10,1003)vcycle,err_vc,max_ef
 
 !        no need err_vc since it is not solving the same problem
-         write(10,1003)vcycle,max_ef
+         write(10,1003)vcycle,err_sm,r_sm,max_ef
 
 !1003 format(' ', 'vcycle:',i2,1x,'err_vc:',es10.3,1x,'ef:',es10.3)
-1003 format(' ', 'vcycle:',i2,1x,'ef:',es10.3)
+1003 format(' ', 'vcycle:',i2,1x,'err_sm:',es10.3,1x, &
+            'r_sm:',es10.3,1x,'ef',es10.3)
       
       enddo ! vcycle
       
