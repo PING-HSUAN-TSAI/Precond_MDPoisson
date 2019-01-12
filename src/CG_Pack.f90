@@ -64,7 +64,7 @@
          rsnew = glsc2(Nx,Ny,r,r,l)
 
          if (abs(rsnew) .lt. tol) then
-            write(10,fmt="(A36,i5,es24.15)")" # of iterations to reach the tolerance: ",k,tol
+            write(10,fmt="(A41,i5,es24.15)")" # of iterations to reach the tolerance: ",k,tol
             exit
          endif
       
