@@ -46,12 +46,10 @@
       call axhelm2(Nx,Ny,x_in,Ax,l)
 
       
+!     conjugate gradient use residual as the initial direction
 !     initial residue and p
       call add3s2(r,f,Ax,1.0,-1.0,Nx,Ny,l)
       call copy(p,r,Nx,Ny,l)
-
-      call chk_amax('inr',r,Nx,Ny,l)
-      call chk_amax('inp',p,Nx,Ny,l)
 
       rsold = glsc2(Nx,Ny,r,r,l)
       
@@ -70,7 +68,7 @@
 
          if (abs(rsnew) .lt. tol) then
       
-            write(10,fmt="(i5,A36,es24.15)")k," iterations to reach the tolerance: ", tol
+            write(10,fmt="(A36,i5,es24.15)")" # of iterations to reach the tolerance: ",k,tol
             exit
          endif
       
@@ -84,7 +82,7 @@
       
       write(10,9999) k,tol
       
-9999 format(' ',' ', 'CG   : iteration#',i5,1p3e12.4)
+9999 format(' ', 'CG   : iteration#',i5,1p3e12.4)
          return
       end subroutine CG
 !----------------------------------------------------------------------

@@ -119,8 +119,8 @@
 
       write(10,9997)k,err,tol
       
-9998 format(' ',' ', 'Projection step',i5,4es24.15)
-9997 format(' ',' ', 'End:',i5,'/',es10.4,1x,es10.4)
+9998 format(' ', 'Projection step',i5,4es24.15)
+9997 format(' ', 'End:',i5,'/',es10.4,1x,es10.4)
       end subroutine Projection_WRAPPER
 !----------------------------------------------------------------
       subroutine vcycle_projection(LD1,LD2,ri,po,l)
@@ -235,7 +235,7 @@
 
          enddo ! smooth
 
-777  format(' ',' ', 'vcycle:' ,i2,1x,'smoothing:',1x,i2,2e10.3)
+777  format(' ', 'vcycle:' ,i2,1x,'smoothing:',1x,i2,2e10.3)
 
 !     Coarse-grid restriction x <--- x + e, where e is approximated on coarse grid
       
@@ -283,7 +283,6 @@
 !---------------------------------------------------------------------------
          enddo
 
-
 !         call hsmg_intp(ef(0:mg_nx(3),0:mg_ny(3),1:TotNum_DM),ec(0:mg_nx(2),0:mg_ny(2),1:TotNum_DM),&
 !         2,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1))
 
@@ -296,7 +295,7 @@
 
          write(10,1003)vcycle,err_vc,max_ef
 
-1003 format(' ',' ', 'vcycle:',i2,1x,'err_vc:',es10.3,1x,'ef:',es10.3)
+1003 format(' ', 'vcycle:',i2,1x,'err_vc:',es10.3,1x,'ef:',es10.3)
       
       enddo ! vcycle
       
