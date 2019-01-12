@@ -255,7 +255,6 @@
 !         ,PolyDegN_DM(1,1,1),PolyDegN_DM(2,1,1))
 
          TotNc = 0; TotN = 0
-      
          do DDK=1,TotNum_DM
             TotNc = TotNc + (PolyDegN_DM(1,DDK,l-1)+1) &
                           * (PolyDegN_DM(2,DDK,l-1)+1)
@@ -263,10 +262,7 @@
                         * (PolyDegN_DM(2,DDK,l)+1)
          enddo
       
-         call chk_amax('xc1',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
-         write(10,*)'check point: before CG'
          xc_in = 0
-         call chk_amax('xci',xc_in,PolyDegN_DM(1,1,l-1),PolyDegN_DM(2,1,l-1),l-1)
 
 !        Call CG to solve for ec
 !         call CG(ec,xc_in,rc_smooth,l-1,6000,1e-20)
