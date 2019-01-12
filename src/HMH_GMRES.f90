@@ -24,7 +24,6 @@
       iconv = 0
       ND1=PolyDegN_DM(1,1,mgl); ND2=PolyDegN_DM(2,1,mgl)
 
-      write(*,*)'here'
 !     Initial guess and upper-Hessenberg form of H
       do i=1,n
          gmres_x(i) = x(i)
