@@ -189,8 +189,6 @@
 
          call alloc_mem_wrapper_var(PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(1,1,mg_lmax-1),TotNum_DM,Nk)
          call Projection_WRAPPER(LD1,LD2,mg_lmax,Nk)
-         write(10,*)'Complete calling Projection & 
-         method with preconditioning'
       
          call copy(potent,x_precond,PolyDegN_DM(1,1,mg_lmax),PolyDegN_DM(2,1,mg_lmax),mg_lmax)
 !------------------------------------------------------------------
