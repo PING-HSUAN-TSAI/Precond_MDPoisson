@@ -51,7 +51,6 @@
       
                call inner_product(Nx,Ny,p_cond,&
                                   (Proj_AP(:,:,:,index_pro)),pc_proAp(index_pro),l)
-      
             enddo !index_pro
       
             do DDK = 1, TotNum_DM
@@ -73,11 +72,9 @@
          
          end if
       
-      
          call axhelm2(Nx,Ny,p_cond,w,l)
       
          pAp_wrapper = glsc2(Nx,Ny,p_cond,w,l)
-      
       
 !        Normalize
          do DDK = 1, TotNum_DM
@@ -103,7 +100,6 @@
       
          alpha_wrapper = glsc2(Nx,Ny,p_cond,r_tmp,l)
       
-      
          call add2s2(x_precond,p_cond,alpha_wrapper,Nx,Ny,l)
          call add3s2(error_precond,v,x_precond,1.0,-1.0,Nx,Ny,l)
          err = glamax(error_precond,Nx,Ny,l)
@@ -119,8 +115,8 @@
             exit
          endif
       
-
       enddo ! end of the projection method
+
       write(10,9997)k,err,tol
       
 9998 format(' ',' ', 'Projection step',i5,4es24.15)
