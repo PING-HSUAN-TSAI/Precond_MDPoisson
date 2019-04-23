@@ -104,6 +104,7 @@
                                     + (    tauD(0:ND1,j,Edge_Num,DDK,l) &
                                     - tau_tilde(0:ND1,j,Edge_Num,DDK,l)) &
                                     *  BvEdge(j,Edge_Num,n,DDK)
+               write(10,*)n,j,BvEdge(j,Edge_Num,n,DDK)
        
                enddo
       !do j=0,ND2
@@ -342,6 +343,35 @@
       enddo
       
       close(1238)
+
+!     Check gloabl A matrix times Mass matrix
+      open(1238,file='ML_lexi.text')
+      do DDK = 1, TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
+         ND1p = ND1 + 1; ND2p = ND2 + 1
+         do n = 1, ND1p*ND2p
+            do j = 0, ND2
+               do i = 0, ND1
+                  write(1238,*)(DDK-1)*(ND1p)*(ND2p)+j*(ND1p)+i,ML(i,j,n,DDK)
+               enddo
+            enddo
+         enddo
+      enddo
+      
+      close(1238)
+
+!     Check gloabl B matrix times Mass matrix
+      open(1238,file='Mass-x.text')
+         do i = 0, ND1
+            write(1238,*)i,LGLWeights(i,ND1)
+         enddo
+      close(1238)
+
+      open(1238,file='Mass-y.text')
+         do i = 0, ND2
+            write(1238,*)i,LGLWeights(i,ND2)
+         enddo
+      close(1238)
       
       end subroutine Construct_ML_operator
       
@@ -512,7 +542,7 @@
       call alloc_mem_jacobismooth_var(PolyDegN_DM(1,1,l),TotNum_DM)
 
       N_vcycle  = 1
-      m_smooth  = 5
+      m_smooth  = 1
       smoothpar = 2.d0/3.d0
 
 !--------------------------------------------------------------------------------
