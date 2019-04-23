@@ -717,6 +717,18 @@
             enddo
          enddo
       enddo
+
+!     Check gloabl rhs vector times Mass matrix
+      open(1238,file='rhs.text')
+      do DDK = 1, TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,mgl); ND2=PolyDegN_DM(2,DDK,mgl)
+            do j = 0, ND2
+               do i = 0, ND1
+                  write(1238,*)(DDK-1)*(ND1+1)*(ND2+1)+j*(ND1+1)+i,rhs(i,j,DDK)
+               enddo
+            enddo
+      enddo
+      close(1238)
       
       return
       
