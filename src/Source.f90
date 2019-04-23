@@ -22,7 +22,7 @@ real(kind=8):: amp, arg, u
 !function begin
 !------------------------------------------------------------------------------
 ! Test case for Paul's paper
-!   v_init = (pi**2) * sin(x) * sin(y)
+   v_init = sin(pi*x) * sin(pi*y)
 !------------------------------------------------------------------------------
 
 ! Test case for hp convergence of continuous material:
@@ -33,7 +33,7 @@ real(kind=8):: amp, arg, u
 !    v_init = cos((0.1*pi)*x) * cos((0.1*pi)*y)
 
 ! Test case for 1D problem
-      v_init = 1 + cos(pi*x)
+!      v_init = 1 + cos(pi*x)
 !------------------------------------------------------------------------------
 
 !    v_init = log(exp(y)*cos(x)+4)
@@ -248,7 +248,7 @@ real(kind=8):: u, arg , amp,tmp1,tmp2
 ! function begin
 !------------------------------------------------------------------------------
 ! Test case for Paul's paper
-!   dFdx_init = (pi**2) * cos(x) * sin(y)
+   dFdx_init = pi * cos(pi*x) * sin(pi*y)
 !------------------------------------------------------------------------------
 ! Test case for hp convergence of continuous material:
 ! 1domain,4domain,9domain,16domain
@@ -258,7 +258,7 @@ real(kind=8):: u, arg , amp,tmp1,tmp2
 ! dFdx_init = - (0.1*pi) * sin((0.1*pi)*x) * cos((0.1*pi)*y)
 
 ! Test case for 1D problem
-      dFdx_init = - pi * sin(pi*x)
+!      dFdx_init = - pi * sin(pi*x)
 !-----------------------------------------------------------------------------
 !  dFdx_init = ( -exp(y)*sin(x)) / (exp(y)*cos(x)+4)
 !-------------------------------------------------------------------
@@ -503,7 +503,7 @@ real(kind=8):: u, arg , amp,tmp1,tmp2
 ! function begin
 !------------------------------------------------------------------------------
 ! Test case for Paul's paper
-!   dFdy_init = (pi**2) * sin(x) * cos(y)
+   dFdy_init = (pi) * sin(pi*x) * cos(pi*y)
 
 !------------------------------------------------------------------------------
 ! Test case for hp convergence of continuous material:
@@ -514,7 +514,7 @@ real(kind=8):: u, arg , amp,tmp1,tmp2
 !dFdy_init = - (0.1*pi) * cos((0.1*pi)*x) * sin((0.1*pi)*y)
 
 ! Test case for 1D problem
-      dFdy_init = 0.0
+!      dFdy_init = 0.0
 !----------------------------------------------------------------------------
  !  dFdy_init = (exp(y)*cos(x)) / (exp(y)*cos(x)+4)
 !-------------------------------------------------------------------
@@ -757,7 +757,7 @@ real(kind=8):: u, arg , amp,tmp1,tmp2
 ! function begin
 !------------------------------------------------------------------------------
 !     Test case for Paul's paper
-!      F_init = 2 * pi**2 * sin(x) * sin(y) 
+      F_init = 2 * pi**2 * sin(pi*x) * sin(pi*y) 
 !------------------------------------------------------------------------------
 ! Test case for hp convergence of continuous material:
 ! 1domain,4domain,9domain,16domain
@@ -767,7 +767,7 @@ real(kind=8):: u, arg , amp,tmp1,tmp2
 !F_init = (0.02*pi**2) * cos((0.1*pi)*x)*cos((0.1*pi)*y)
 
 ! Test case for 1D problem
-      F_init = pi**2 * cos(pi*x)
+!      F_init = pi**2 * cos(pi*x)
 !------------------------------------------------------------------------------
 !    F_init = (exp(2*y)) &
 !           / (exp(y)*cos(x)+4)**2.0
@@ -976,47 +976,47 @@ XJ=(0,1)
 ! subroutine begin
 !------------------------------------------------------------------------------
 !     Test case for Pual's paper
-!      arg1= x
-!      arg2= y
-!      CFun= cos(arg1)*sin(arg2); SFun = sin(arg1)*cos(arg2)
-!   
-!      select case (Edge_Num)
-!      case(1)
-!         g_ext = alpha * (pi**2 * sin(arg1)*sin(arg2) ) &
-!               + beta * pi**2 * (CFun * nx + SFun * ny)
-!      case(3)
-!         g_ext = alpha * (pi**2 * sin(arg1)*sin(arg2) ) &
-!               + beta * pi**2 * (CFun * nx + SFun * ny)
-!      case(2)
-!         g_ext = alpha * (pi**2 * sin(arg1)*sin(arg2) ) &
-!               + beta * pi**2 * (CFun * nx + SFun * ny)
-!      case(4)
-!         g_ext = alpha * (pi**2 * sin(arg1)*sin(arg2) ) &
-!               + beta * pi**2 * (CFun * nx + SFun * ny)
-!      end select
+      arg1= pi*x
+      arg2= pi*y
+      CFun= cos(arg1)*sin(arg2); SFun = sin(arg1)*cos(arg2)
+   
+      select case (Edge_Num)
+      case(1)
+         g_ext = alpha * ( sin(arg1)*sin(arg2) ) &
+               + beta * pi * (CFun * nx + SFun * ny)
+      case(3)
+         g_ext = alpha * ( sin(arg1)*sin(arg2) ) &
+               + beta * pi * (CFun * nx + SFun * ny)
+      case(2)
+         g_ext = alpha * ( sin(arg1)*sin(arg2) ) &
+               + beta * pi * (CFun * nx + SFun * ny)
+      case(4)
+         g_ext = alpha * ( sin(arg1)*sin(arg2) ) &
+               + beta * pi * (CFun * nx + SFun * ny)
+      end select
 !------------------------------------------------------------------------------
 ! Test case for hp convergence of continuous material:
 ! 1domain,4domain,9domain,16domain
 
 
-   arg1= pi*x
-   arg2= pi*y
-CFun= -sin(arg1); SFun = 0.d0
-
- select case (Edge_Num)
- case(1)
-   g_ext = alpha * (1 + cos(arg1) ) &
-         + beta * pi * (CFun * nx + SFun * ny)
-case(3)
-   g_ext = alpha * (1 + cos(arg1) ) &
-         + beta *  pi * (CFun * nx + SFun * ny)
-case(2)
-   g_ext = alpha * (1 + cos(arg1) ) &
-         + beta *  pi * (CFun * nx + SFun * ny)
-case(4)
-    g_ext = alpha * (1 + cos(arg1) ) &
-          + beta *  pi * (CFun * nx + SFun * ny)
-end select
+!   arg1= pi*x
+!   arg2= pi*y
+!CFun= -sin(arg1); SFun = 0.d0
+!
+! select case (Edge_Num)
+! case(1)
+!   g_ext = alpha * (1 + cos(arg1) ) &
+!         + beta * pi * (CFun * nx + SFun * ny)
+!case(3)
+!   g_ext = alpha * (1 + cos(arg1) ) &
+!         + beta *  pi * (CFun * nx + SFun * ny)
+!case(2)
+!   g_ext = alpha * (1 + cos(arg1) ) &
+!         + beta *  pi * (CFun * nx + SFun * ny)
+!case(4)
+!    g_ext = alpha * (1 + cos(arg1) ) &
+!          + beta *  pi * (CFun * nx + SFun * ny)
+!end select
 !arg1= (0.1*pi)*x
 !arg2= (0.1*pi)*y
 !CFun= -sin(arg1)*cos(arg2); SFun=-cos(arg1)*sin(arg2)
