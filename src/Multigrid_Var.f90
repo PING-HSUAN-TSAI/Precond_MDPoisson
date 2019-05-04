@@ -395,7 +395,7 @@
 
       scale_c = 1.d0
       end subroutine
-!----------------------------------------------------------------------      
+!---------------------------------------------------------------------- 
       subroutine Initial_I_U(DegDM,TotNumDomain)
 
       implicit none
@@ -436,5 +436,30 @@
 !      enddo
 !      close(1123)
       end subroutine Initial_I_U
+!---------------------------------------------------------------------- 
+      subroutine Initial_I_U_full(DegDM,TotNumDomain)
+
+      implicit none
+      integer:: DegDM(2,TotNumDomain)
+      integer:: TotNumDomain
+      integer:: ND1, ND2
+      integer:: ND1p, ND2p
+      integer:: DDK, n
+      integer:: i, j
+      
+      do DDK = 1, TotNumDomain
+         ND1 = DegDM(1,DDK); ND2 = DegDM(2,DDK)
+         ND1p = ND1 + 1; ND2p = ND2 + 1
+      
+         do j = 0, ND2
+            do i = 0, ND1
+               n = ( j * ND2p + i  + 1)
+               I_U(i,j,n,DDK) = 1
+            enddo
+         enddo
+         
+      enddo
+      
+      end subroutine Initial_I_U_full
         
       end module Multigrid_Var
