@@ -603,6 +603,19 @@
          enddo ! j
       enddo !DDK
 
+      open(1238,file='rhs_withoutmask.text')
+      do DDK = 1, TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,mgl); ND2=PolyDegN_DM(2,DDK,mgl)
+            do j = 0, ND2
+               do i = 0, ND1
+                  write(1238,*)(DDK-1)*(ND1+1)*(ND2+1)+j*(ND1+1)+i, &
+                                rhs(i,j,DDK)
+               enddo
+            enddo
+      enddo
+      close(1238)
+
+      call outpost(rhs,mgl,'rwo')
       return
       
       end subroutine Initial_Field
@@ -724,11 +737,13 @@
          ND1=PolyDegN_DM(1,DDK,mgl); ND2=PolyDegN_DM(2,DDK,mgl)
             do j = 0, ND2
                do i = 0, ND1
-                  write(1238,*)(DDK-1)*(ND1+1)*(ND2+1)+j*(ND1+1)+i,rhs(i,j,DDK)
+                  write(1238,*)(DDK-1)*(ND1+1)*(ND2+1)+j*(ND1+1)+i, &
+                                rhs(i,j,DDK)
                enddo
             enddo
       enddo
       close(1238)
+      call outpost(rhs,mgl,'rhs')
       
       return
       
