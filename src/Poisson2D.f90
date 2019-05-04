@@ -223,7 +223,8 @@
 !------------------------------------------------------------------
 
       close(9)
-      call Field_Final(1)
+      call Field_Final(mg_lmax)
+      call outpost(potent,mg_lmax,'sol')
 
       call Init_ERR(PolyDegN_DM(1,1,mg_lmax),TotNum_DM) !--ERR_Var.f90
       write(10,*)'Complete Initializing Error Variables'
