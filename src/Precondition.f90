@@ -1398,3 +1398,300 @@
       enddo
       
       end subroutine
+!-----------------------------------------------------------------------
+      subroutine Construct_ML_operator_full(LD1,LD2,lpts,l)
+      use constants
+      use Legendre
+      use MD2D_Grid
+      use State_Var
+      use Multigrid_Var
+
+      implicit none
+      integer:: ND1p, ND2p, n, lpts, LD1, LD2
+      integer:: i, j, l
+      
+      real(kind=8) :: dudx(0:LD1,0:LD2,1:lpts), dudy(0:LD1,0:LD2,1:lpts)
+      real(kind=8) :: temp1(0:LD1,0:LD2,1:lpts,1:TotNum_DM),& 
+                      temp2(0:LD1,0:LD2,1:lpts,1:TotNum_DM)
+      real(kind=8) :: BvEdge(0:LD1,1:4,1:lpts,1:TotNum_DM)
+      real(kind=8) :: BITF1(0:LD1,1:4,1:lpts,1:TotNum_DM),& 
+                      BITF2(0:LD1,1:4,1:lpts,1:TotNum_DM)
+      
+      
+      call alloc_mem_MLoperator_var(PolyDegN_DM(1,1,l),TotNum_DM)
+!      call alloc_mem_Multigrid_var(PolyDegN_DM(1,1,1),TotNum_DM,1)
+      
+!      call Initial_I_U(PolyDegN_DM(1:2,1:TotNum_DM,l),TotNum_DM)
+      call Initial_I_U_full(PolyDegN_DM(1:2,1:TotNum_DM,l),TotNum_DM)
+      
+        
+      do DDK=1,TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
+         ND1p = ND1 + 1; ND2p = ND2 + 1
+         do n = 1, (ND1p * ND2p)
+            ! Compute
+            dudx(0:ND1,0:ND2,n) = Matmul(Diff_xi1(0:ND1,0:ND1,ND1), &
+                                              I_U(0:ND1,0:ND2,n,DDK))
+      
+            dudy(0:ND1,0:ND2,n) = Matmul( I_U(0:ND1,0:ND2,n,DDK),&
+                                     Diff_xi2(0:ND2,0:ND2,ND2))
+      
+      
+            temp1(0:ND1,0:ND2,n,DDK) = &
+               dxi1_dx1(0:ND1,0:ND2,DDK,l) * dudx(0:ND1,0:ND2,n) &
+             + dxi2_dx1(0:ND1,0:ND2,DDK,l) * dudy(0:ND1,0:ND2,n)
+                                  
+            temp2(0:ND1,0:ND2,n,DDK) = &
+               dxi1_dx2(0:ND1,0:ND2,DDK,l) * dudx(0:ND1,0:ND2,n) &
+             + dxi2_dx2(0:ND1,0:ND2,DDK,l) * dudy(0:ND1,0:ND2,n)
+         enddo
+      enddo
+      
+      do DDK=1,TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
+         ND1p = ND1 + 1; ND2p = ND2 + 1
+         do n = 1, (ND1p*ND2p)
+            ! Compute divergence b*F  (div dot bF)
+            dudx(0:ND1,0:ND2,n) = ( dxi1_dx1(0:ND1,0:ND2,DDK,l) & 
+                                *      temp1(0:ND1,0:ND2,n,DDK)  &
+                                +   dxi1_dx2(0:ND1,0:ND2,DDK,l) & 
+                                *      temp2(0:ND1,0:ND2,n,DDK) ) &
+                                *    Jacobin(0:ND1,0:ND2,DDK,l) &
+                                *      b_pts(0:ND1,0:ND2,DDK,l)
+      
+            dudy(0:ND1,0:ND2,n) = ( dxi2_dx1(0:ND1,0:ND2,DDK,l) &
+                                *      temp1(0:ND1,0:ND2,n,DDK)  &
+                                +   dxi2_dx2(0:ND1,0:ND2,DDK,l) & 
+                                *      temp2(0:ND1,0:ND2,n,DDK) ) &
+                                *    Jacobin(0:ND1,0:ND2,DDK,l) &
+                                *      b_pts(0:ND1,0:ND2,DDK,l)
+      
+      
+            ML(0:ND1,0:ND2,n,DDK) = - Matmul(Diff_xi1(0:ND1,0:ND1,ND1), &
+                                                 dudx(0:ND1,0:ND2,n)) &
+                                    - Matmul(    dudy(0:ND1,0:ND2,n), &
+                                             Diff_xi2(0:ND2,0:ND2,ND2))
+         enddo
+      enddo
+       
+      call compute_PBC_MG(LD1,LD2,lpts,temp1,temp2,BvEdge,BITF1,BITF2,l)
+      
+      do DDK=1,TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
+         ND1p = ND1 + 1; ND2p = ND2 + 1
+         do n = 1, (ND1p*ND2p)
+            ! Start adding penalty
+            ! Side 4
+            Edge_Num=4
+            select case (BC_Type(Edge_Num,DDK))
+               case(1)
+               do j = 0,ND2
+                  ML(0:ND1,j,n,DDK) = ML(0:ND1,j,n,DDK) &
+                                    + (    tauD(0:ND1,j,Edge_Num,DDK,l) & 
+                                    - tau_tilde(0:ND1,j,Edge_Num,DDK,l)) & 
+                                    *  BvEdge(j,Edge_Num,n,DDK)
+               write(10,*)n,j,BvEdge(j,Edge_Num,n,DDK)
+               enddo
+               case(2,3)
+      
+               do j = 0,ND2
+                  ML(0:ND1,j,n,DDK) = ML(0:ND1,j,n,DDK) &
+                                    +    tauND1(0:ND1,j,Edge_Num,DDK,l) & 
+                                    *  BvEdge(j,Edge_Num,n,DDK)
+       
+               enddo
+      
+               ! Add interface penalty : first set of dirichlet
+               case(0)
+               do j=0,ND2
+                  ML(0:ND1,j,n,DDK) = ML(0:ND1,j,n,DDK) &
+                                    + tau1(0:ND1,j,Edge_Num,DDK,l)  &
+                                    * BITF1(j,Edge_Num,n,DDK)
+                  ML(0,0:ND2,n,DDK) = ML(0,0:ND2,n,DDK) &
+                                    + tau3(j,0:ND2,Edge_Num,DDK,l) &
+                                    * BITF1(j,Edge_Num,n,DDK)     
+               enddo
+               ML(0,0:ND2,n,DDK) = ML(0,0:ND2,n,DDK) &
+                                 + tau2(0:ND2,Edge_Num,DDK,l) &
+                                 * BITF1(0:ND2,Edge_Num,n,DDK)
+               ! Add interface penalty : second set of dirichlet
+               ML(0,0:ND2,n,DDK) = ML(0,0:ND2,n,DDK) &
+                                 + Sigma_tild(0:ND2,Edge_Num,DDK,l) &
+                                 *    BITF1(0:ND2,Edge_Num,n,DDK)
+               ! Add interface penalty : neumann
+               ML(0,0:ND2,n,DDK) = ML(0,0:ND2,n,DDK) &
+                                 + SigmaHat(0:ND2,Edge_Num,DDK,l) &
+                                 *  BITF2(0:ND2,Edge_Num,n,DDK)
+      
+            end select
+
+            ! Side 2
+            Edge_Num=2
+            select case (BC_Type(Edge_Num,DDK))
+               case(1)
+               do j=0,ND2
+                  ML(0:ND1,j,n,DDK)  = ML(0:ND1,j,n,DDK) &
+                                     + (    tauD(0:ND1,j,Edge_Num,DDK,l) & 
+                                     - tau_tilde(0:ND1,j,Edge_Num,DDK,l)) & 
+                                     *  BvEdge(j,Edge_Num,n,DDK)
+               enddo
+               case(2,3)
+               do j=0,ND2
+                  ML(0:ND1,j,n,DDK) = ML(0:ND1,j,n,DDK) &
+                                    +    tauND1(0:ND1,j,Edge_Num,DDK,l) & 
+                                    *  BvEdge(j,Edge_Num,n,DDK)
+               enddo
+      
+               ! Add interface penalty : first set of dirichlet
+               case(0)
+               do j=0,ND2
+                  ML(0:ND1,j,n,DDK) = ML(0:ND1,j,n,DDK) &
+                                    + tau1(0:ND1,j,Edge_Num,DDK,l) &
+                                    * BITF1(j,Edge_Num,n,DDK)
+                  ML(ND1,0:ND2,n,DDK) = ML(ND1,0:ND2,n,DDK) &
+                                      + tau3(j,0:ND2,Edge_Num,DDK,l) &
+                                      * BITF1(j,Edge_Num,n,DDK)
+               enddo
+               ML(ND1,0:ND2,n,DDK) = ML(ND1,0:ND2,n,DDK) &
+                                   + tau2(0:ND2,Edge_Num,DDK,l) &
+                                   * BITF1(0:ND2,Edge_Num,n,DDK)
+               ! Add interface penalty : second set of dirichlet
+               ML(ND1,0:ND2,n,DDK) = ML(ND1,0:ND2,n,DDK) &
+                                   + Sigma_tild(0:ND2,Edge_Num,DDK,l) &
+                                   * BITF1(0:ND2,Edge_Num,n,DDK)
+               ! Add interface penalty : neumann
+               ML(ND1,0:ND2,n,DDK) = ML(ND1,0:ND2,n,DDK) &
+                                   + SigmaHat(0:ND2,Edge_Num,DDK,l) &
+                                   * BITF2(0:ND2,Edge_Num,n,DDK)
+            end select
+      
+            ! Side 1
+            Edge_Num=1
+            select case (BC_Type(Edge_Num,DDK))
+               case(1)
+               do i=0,ND1
+                  ML(i,0:ND2,n,DDK) = ML(i,0:ND2,n,DDK) & 
+                                    + (    tauD(i,0:ND2,Edge_Num,DDK,l) & 
+                                    - tau_tilde(i,0:ND2,Edge_Num,DDK,l))& 
+                                    *  BvEdge(i,Edge_Num,n,DDK)
+      
+               enddo
+               case(2,3)
+               do i=0,ND1
+                  ML(i,0:ND2,n,DDK) = ML(i,0:ND2,n,DDK) &
+                                    +    tauND1(i,0:ND2,Edge_Num,DDK,l) & 
+                                    *  BvEdge(i,Edge_Num,n,DDK)
+      
+               enddo
+               case(0)
+      
+               ! Add interface penalty : first set of dirichlet
+               do i=0,ND1
+                  ML(i,0:ND2,n,DDK) = ML(i,0:ND2,n,DDK) &
+                                    +     tau1(i,0:ND2,Edge_Num,DDK,l) &
+                                    *  BITF1(i,Edge_Num,n,DDK)
+                  ML(0:ND1,0,n,DDK) = ML(0:ND1,0,n,DDK) &
+                                    +     tau3(i,0:ND1,Edge_Num,DDK,l) &
+                                    *  BITF1(i,Edge_Num,n,DDK)        
+               enddo
+               ML(0:ND1,0,n,DDK) = ML(0:ND1,0,n,DDK) &
+                                 +     tau2(0:ND1,Edge_Num,DDK,l) &
+                                 *  BITF1(0:ND1,Edge_Num,n,DDK)
+               ! Add interface penalty : second set of dirichlet
+               ML(0:ND1,0,n,DDK) = ML(0:ND1,0,n,DDK) &
+                                 + Sigma_tild(0:ND1,Edge_Num,DDK,l) &
+                                 *    BITF1(0:ND1,Edge_Num,n,DDK)
+               ! Add interface penalty : neumann
+               ML(0:ND1,0,n,DDK) = ML(0:ND1,0,n,DDK) &
+                                 + SigmaHat(0:ND1,Edge_Num,DDK,l) &
+                                 *  BITF2(0:ND1,Edge_Num,n,DDK)
+            end select
+      
+            ! Side 3
+            Edge_Num=3
+            select case (BC_Type(Edge_Num,DDK))
+               case(1)
+               do i=0,ND1
+                  ML(i,0:ND2,n,DDK) = ML(i,0:ND2,n,DDK) &
+                                    + (    tauD(i,0:ND2,Edge_Num,DDK,l) &
+                                    - tau_tilde(i,0:ND2,Edge_Num,DDK,l)) &
+                                    *   BvEdge(i,Edge_Num,n,DDK)
+               enddo
+      
+               case(2,3)
+               do i=0,ND1
+                  ML(i,0:ND2,n,DDK) = ML(i,0:ND2,n,DDK) &
+                                    +    tauND1(i,0:ND2,Edge_Num,DDK,l) & 
+                                    *  BvEdge(i,Edge_Num,n,DDK)
+               enddo
+
+               ! Add interface penalty : first set of dirichlet
+               case(0)
+               do i=0,ND1
+                  ML(i,0:ND2,n,DDK) = ML(i,0:ND2,n,DDK) &
+                                    +     tau1(i,0:ND2,Edge_Num,DDK,l) &
+                                    *  BITF1(i,Edge_Num,n,DDK)
+                  ML(0:ND1,ND2,n,DDK) = ML(0:ND1,ND2,n,DDK) &
+                                      +    tau3(i,0:ND1,Edge_Num,DDK,l) & 
+                                      * BITF1(i,Edge_Num,n,DDK)          
+               enddo
+               ML(0:ND1,ND2,n,DDK) = ML(0:ND1,ND2,n,DDK) &
+                                   +     tau2(0:ND1,Edge_Num,DDK,l) &
+                                   *  BITF1(0:ND1,Edge_Num,n,DDK)
+               ! Add interface penalty : second set of dirichlet
+               ML(0:ND1,ND2,n,DDK) = ML(0:ND1,ND2,n,DDK) &
+                                   + Sigma_tild(0:ND1,Edge_Num,DDK,l) &
+                                   *    BITF1(0:ND1,Edge_Num,n,DDK)
+               ! Add interface penalty : neumann
+               ML(0:ND1,ND2,n,DDK) = ML(0:ND1,ND2,n,DDK) &
+                                   + SigmaHat(0:ND1,Edge_Num,DDK,l) &
+                                   *  BITF2(0:ND1,Edge_Num,n,DDK)
+            end select
+         enddo !n
+      enddo !DDK
+      
+      ! Multiply mass matrix in x,y direction
+      do DDK=1,TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
+         ND1p = ND1 + 1; ND2p = ND2 + 1
+         do n = 1, (ND1p*ND2p)
+            do j = 0, ND2
+               do i = 0, ND1
+                  ML(i,j,n,DDK) = ML(i,j,n,DDK) * LGLWeights(j,ND2) & 
+                                * LGLWeights(i,ND1)
+               enddo
+            enddo
+         enddo
+      enddo
+      
+!     Check gloabl A matrix times Mass matrix
+      open(1238,file='ML_lexi.text')
+      do DDK = 1, TotNum_DM
+         ND1=PolyDegN_DM(1,DDK,l); ND2=PolyDegN_DM(2,DDK,l)
+         ND1p = ND1 + 1; ND2p = ND2 + 1
+         do n = 1, ND1p*ND2p
+            do j = 0, ND2
+               do i = 0, ND1
+                  write(1238,*)(DDK-1)*(ND1p)*(ND2p)+j*(ND1p)+i, &
+                               ML(i,j,n,DDK)
+               enddo
+            enddo
+         enddo
+      enddo
+      
+      close(1238)
+
+!     Check gloabl B matrix times Mass matrix
+      open(1238,file='Mass-x.text')
+         do i = 0, ND1
+            write(1238,*)i,LGLWeights(i,ND1)
+         enddo
+      close(1238)
+
+      open(1238,file='Mass-y.text')
+         do i = 0, ND2
+            write(1238,*)i,LGLWeights(i,ND2)
+         enddo
+      close(1238)
+      
+      end subroutine Construct_ML_operator_full
